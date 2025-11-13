@@ -13,7 +13,7 @@ import subprocess
 # --- SCRIPT CONFIGURATION v4.4 ---
 
 # --- 1. Your Personal Settings ---
-USER_LOCATION = (32.008, 35.521) # Your updated location
+USER_LOCATION = (32.00247, 35.87108) # Your updated location
 AVG_WALK_SPEED_MPS = 1.3 
 AVG_BUS_SPEED_MPS = 8.3  
 
@@ -386,4 +386,76 @@ if __name__ == "__main__":
             is_night_log = True
             sleep_duration = 30 * 60 
             if ping_streak > 0: append_status_log(f"{current_time.isoformat()} - Streak: {ping_streak}.")
-            print(f"Zzz... (It's {current_time.strftime
+            print(f"Zzz... (It's {current_time.strftime('%H:%M')}). Night mode. Checking in 30 mins.")
+            append_status_log(f"{current_time.isoformat()} - Entering night mode. Gute Nacht!")
+            ping_streak = 0
+        
+        # --- 2. FETCH DATA ---
+        total_buses_found_live = 0
+        all_buses_for_csv = []
+        api_success = False
+
+        for direction, url in API_URLS.items():
+            full_data = get_full_route_data(url)
+            if full_data:
+                api_success = True 
+                live_buses = full_data.get('busList', [])
+                
+                if live_buses:
+                    if is_active_hours:
+                        # This is the call that was failing
+                        total_buses_found_live += save_live_to_firebase(live_buses, direction)
+                    
+                    for bus in live_buses: bus['direction'] = direction
+                    all_buses_for_csv.extend(live_buses)
+                
+                if is_active_hours and full_data.get('pointList'):
+                    save_static_data_to_firebase(full_data, direction)
+        
+        # --- 3. PROCESS RESULTS ---
+        if api_success:
+            total_ping_count += 1
+            consecutive_errors = 0
+            csv_count = save_historical_to_csv(all_buses_for_csv, current_time, is_night_log)
+            
+            if is_active_hours:
+                ping_streak += 1
+                if ping_streak > best_streak: best_streak = ping_streak
+                
+                summary = f"SUCCESS: Saved {total_buses_found_live} Firebase, {csv_count} CSV. Streak: {ping_streak}. Total Pings: {total_ping_count}"
+                print(f"  > {summary}")
+                
+                if ping_streak % 10 == 0: append_status_log(summary)
+                
+                # --- 4. GENERATE & DEPLOY BUS AUNTY (NEW!) ---
+                if generate_bus_aunty_html():
+                    if total_ping_count % 5 == 0:
+                        deploy_to_firebase_hosting() 
+
+                if total_ping_count in MORALE_PING_TARGETS:
+                    print(f"\n  > GLÜCKWUNSCH! {total_ping_count} total pings! Weiter so!\n")
+                    append_status_log(f"{current_time.isoformat()} - !!! MILESTONE: {total_ping_count} pings !!!")
+            
+            else:
+                summary = f"NIGHT LOG: Saved {csv_count} parked bus locations to CSV."
+                print(f"  > {summary}"); append_status_log(f"{current_time.isoformat()} - {summary}")
+
+        else: # API FAILURE
+            consecutive_errors += 1
+            print(f"  > ❌ API ERROR. Strike {consecutive_errors} of 5.")
+            if ping_streak > 0:
+                print(f"  > Streak lost at {ping_streak}. Best: {best_streak}")
+                quote, attribution = random.choice(GERMAN_QUOTES)
+                print(f"  > Ach, schade! '{quote}' ({attribution})\n")
+                append_status_log(f"{current_time.isoformat()} - STREAK LOST at {ping_streak}.")
+            ping_streak = 0 
+
+        if consecutive_errors >= 5:
+            print("\n❌ STOPPING SCRIPT: 5 consecutive errors.")
+            error_msg = f"{current_time.isoformat()} - STOPPING SCRIPT. 5 consecutive errors."
+            append_status_log(error_msg)
+            # notify_n8n(N8N_FAILURE_URL, {"message": error_msg})
+            break 
+
+        print(f"\nWaiting for {sleep_duration:.1f} seconds...\n")
+        time.sleep(sleep_duration)
