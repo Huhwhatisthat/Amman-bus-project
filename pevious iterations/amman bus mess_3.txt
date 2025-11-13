@@ -1,0 +1,165 @@
+import requests
+import json
+import time
+import random
+import datetime
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# --- Firebase Setup ---
+try:
+    cred = credentials.Certificate("serviceAccountKey.json")
+    if not firebase_admin._apps: # Check if app is already initialized
+        firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    print("✅ Successfully connected to Firebase!")
+except FileNotFoundError:
+    print("❌ ERROR: 'serviceAccountKey.json' not found.")
+    exit()
+# ------------------------
+
+API_URL_DIRECTION_0 = "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=0&displayRouteCode=99&resultType=010000"
+API_URL_DIRECTION_1 = "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=1&displayRouteCode=99&resultType=010000"
+
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+    'Referer': 'https://online.ammanbus.jo/',
+    'Origin': 'https://online.ammanbus.jo'
+}
+
+def get_full_route_data(api_url):
+    """
+    Pings the API and returns the ENTIRE pathList object,
+    which includes busList, pointList, and busStopList.
+    """
+    try:
+        response = requests.get(api_url, headers=HEADERS, timeout=10)
+        response.raise_for_status() 
+        data = response.json()
+        
+        # We're now returning the FIRST (and only) item from pathList
+        if data.get('pathList'):
+            return data['pathList'][0]
+        else:
+            return None
+            
+    except Exception as e:
+        print(f"  > Error fetching data from API: {e}")
+        return None 
+
+def save_live_bus_data(buses, direction_id):
+    """
+    Saves only the live bus location data to Firestore.
+    """
+    if not buses:
+        return 0
+
+    batch = db.batch()
+    
+    for bus in buses:
+        bus_id_str = str(bus['busId']) 
+        bus_ref = db.collection(f"route99_direction_{direction_id}").document(bus_id_str)
+        
+        bus_data_to_save = {
+            'busId': bus.get('busId'),
+            'lat': bus.get('lat'),
+            'lng': bus.get('lng'),
+            'bearing': bus.get('bearing'),
+            'plateNumber': bus.get('plateNumber'),
+            'last_seen': firestore.SERVER_TIMESTAMP,
+            'direction': direction_id
+        }
+        
+        batch.set(bus_ref, bus_data_to_save, merge=True) # Merge=True is safer
+    
+    try:
+        batch.commit()
+        print(f"  > Successfully saved {len(buses)} LIVE bus locations for direction {direction_id}.")
+        return len(buses)
+    except Exception as e:
+        print(f"  > Error saving LIVE data: {e}")
+        return 0
+
+def save_static_route_data(full_route_data, direction_id):
+    """
+    Saves the STATIC route data (points, stops, schedule) to Firestore.
+    This will only run if we successfully get the data.
+    """
+    try:
+        # Create a dictionary to hold ALL static data
+        static_data = {
+            'pointList': full_route_data.get('pointList', []),
+            'busStopList': full_route_data.get('busStopList', []),
+            'scheduleList': full_route_data.get('scheduleList', []),
+            'timeTableList': full_route_data.get('timeTableList', []),
+            'headSign': full_route_data.get('headSign', ''),
+            'tripShortName': full_route_data.get('tripShortName', ''),
+            'path_code': full_route_data.get('path_code', ''),
+            'last_updated': firestore.SERVER_TIMESTAMP
+        }
+        
+        # We save this in a *new* collection called 'static_route_data'
+        # Each document in this collection will be a route (e.g., "route_99_dir_0")
+        doc_ref = db.collection("static_route_data").document(f"route_99_dir_{direction_id}")
+        doc_ref.set(static_data)
+        
+        print(f"  > Successfully saved STATIC data (stops/path/schedule) for direction {direction_id}.")
+        return True
+    
+    except Exception as e:
+        print(f"  > Error saving STATIC data: {e}")
+        return False
+
+# --- Main part of the script ---
+if __name__ == "__main__":
+    
+    consecutive_errors = 0 
+    
+    while True:
+        print(f"--- Fetching new bus data (Timestamp: {time.ctime()}) ---")
+        
+        # 1. Fetch ALL data for Direction 0
+        route_data_0 = get_full_route_data(API_URL_DIRECTION_0)
+        
+        # 2. Fetch ALL data for Direction 1
+        route_data_1 = get_full_route_data(API_URL_DIRECTION_1)
+        
+        total_buses_found = 0
+        
+        # Process Direction 0
+        if route_data_0:
+            # Save the live bus list
+            live_buses_0 = route_data_0.get('busList', [])
+            total_buses_found += save_live_bus_data(live_buses_0, 0)
+            
+            # Save the static data (if it has stops/points)
+            if route_data_0.get('pointList') or route_data_0.get('busStopList'):
+                save_static_route_data(route_data_0, 0)
+        
+        # Process Direction 1
+        if route_data_1:
+            # Save the live bus list
+            live_buses_1 = route_data_1.get('busList', [])
+            total_buses_found += save_live_bus_data(live_buses_1, 1)
+
+            # Save the static data (if it has stops/points)
+            if route_data_1.get('pointList') or route_data_1.get('busStopList'):
+                save_static_route_data(route_data_1, 1)
+
+        # Check for errors
+        if total_buses_found > 0:
+            consecutive_errors = 0 
+            print(f"  > TOTAL: Found and saved {total_buses_found} buses.")
+        
+        else:
+            if route_data_0 is None and route_data_1 is None:
+                consecutive_errors += 1
+                print(f"  > Could not retrieve ANY bus data. Strike {consecutive_errors} of 5.")
+        
+        if consecutive_errors >= 5:
+            print("\n❌ STOPPING SCRIPT: 5 consecutive errors.")
+            break 
+
+        sleep_duration = random.uniform(30, 45)
+        print(f"\nWaiting for {sleep_duration:.1f} seconds before next ping...\n")
+        time.sleep(sleep_duration)

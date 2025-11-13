@@ -1,0 +1,68 @@
+import requests
+import json
+import time
+
+# This is the EXACT URL you found. It's the only thing we need.
+# It has all the "payload" info (like route=99) built right in.
+BUS_API_URL = "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=0&displayRouteCode=99&resultType=010000"
+
+# These headers help us look like a real browser
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+    'Referer': 'https://online.ammanbus.jo/',
+    'Origin': 'https://online.ammanbus.jo'
+}
+
+def get_bus_locations():
+    """
+    Pings the Amman Bus API and returns the list of buses.
+    """
+    try:
+        # We use requests.get() because it's a GET request
+        response = requests.get(BUS_API_URL, headers=HEADERS)
+        
+        # This will raise an error if the request failed
+        response.raise_for_status() 
+        
+        # Parse the JSON response
+        data = response.json()
+        
+        # Navigate the JSON to get to the list
+        # Based on your response: data -> result -> pathList[0] -> busList
+        bus_list = data.get('pathList', [{}])[0].get('busList', [])
+        
+        return bus_list
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        return None
+    except json.JSONDecodeError:
+        print("Error: Could not decode JSON response. The API might be down.")
+        return None
+
+# --- Main part of the script ---
+if __name__ == "__main__":
+    while True:
+        print(f"--- Fetching new bus data (Timestamp: {time.ctime()}) ---")
+        
+        buses = get_bus_locations()
+        
+        if buses:
+            print(f"Successfully found {len(buses)} buses for Route 99.")
+            for bus in buses:
+                bus_id = bus['busId']
+                plate = bus['plateNumber']
+                lat = bus['lat']
+                lng = bus['lng']
+                bearing = bus['bearing']
+                
+                print(f"  > Bus ID: {bus_id} ({plate}) | Lat: {lat}, Lng: {lng} | Bearing: {bearing}°")
+            
+            # HERE is where you would save to Firebase/GCP
+            # save_to_database(buses)
+        
+        else:
+            print("Could not retrieve bus data this cycle.")
+
+        print("\nWaiting for 30 seconds before next ping...\n")
+        time.sleep(30)

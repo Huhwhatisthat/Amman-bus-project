@@ -1,0 +1,91 @@
+import requests
+import json
+import time
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# --- Firebase Setup ---
+# Initialize our connection to Firebase
+# This looks for the "serviceAccountKey.json" file in the same folder
+try:
+    cred = credentials.Certificate("serviceAccountKey.json")
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    print("✅ Successfully connected to Firebase!")
+except FileNotFoundError:
+    print("❌ ERROR: 'serviceAccountKey.json' not found.")
+    print("Please download the key file from Firebase and place it in this folder.")
+    exit() # Exit the script if the key isn't found
+# ------------------------
+
+
+BUS_API_URL = "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=0&displayRouteCode=99&resultType=010000"
+
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+    'Referer': 'https://online.ammanbus.jo/',
+    'Origin': 'https://online.ammanbus.jo'
+}
+
+def get_bus_locations():
+    """
+    Pings the Amman Bus API and returns the list of buses.
+    """
+    try:
+        response = requests.get(BUS_API_URL, headers=HEADERS)
+        response.raise_for_status() 
+        data = response.json()
+        bus_list = data.get('pathList', [{}])[0].get('busList', [])
+        return bus_list
+    except Exception as e:
+        print(f"Error fetching data from API: {e}")
+        return None
+
+def save_to_firestore(buses):
+    """
+    Saves the entire list of buses to Firestore.
+    We will create one document per bus in the 'buses' collection.
+    """
+    # Get a "batch" writer to do all updates at once
+    batch = db.batch()
+    
+    for bus in buses:
+        # We will use the bus's 'busId' as the unique document ID
+        # This way, we just *update* its data instead of making duplicates
+        bus_id_str = str(bus['busId']) 
+        
+        # Get a reference to the document for this specific bus
+        # This will be in a collection called "route99"
+        bus_ref = db.collection("route99").document(bus_id_str)
+        
+        # Add the bus data to the batch
+        # .set() will create the document if it doesn't exist
+        # or *completely overwrite* it if it does. This is perfect for us.
+        batch.set(bus_ref, bus)
+    
+    # "Commit" the batch to send all the data to Firebase
+    try:
+        batch.commit()
+        print(f"  > Successfully saved {len(buses)} bus locations to Firebase.")
+    except Exception as e:
+        print(f"  > Error saving to Firebase: {e}")
+
+
+# --- Main part of the script ---
+if __name__ == "__main__":
+    while True:
+        print(f"--- Fetching new bus data (Timestamp: {time.ctime()}) ---")
+        
+        buses = get_bus_locations()
+        
+        if buses:
+            print(f"  > Successfully found {len(buses)} buses for Route 99.")
+            
+            # This is the new step!
+            save_to_firestore(buses)
+        
+        else:
+            print("  > Could not retrieve bus data this cycle.")
+
+        print("\nWaiting for 30 seconds before next ping...\n")
+        time.sleep(30)
