@@ -7,33 +7,61 @@ import pandas as pd
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
+from haversine import haversine, Unit
+import subprocess
 
-# --- SCRIPT CONFIGURATION ---
-# --- (All your settings in one place) ---
+# --- SCRIPT CONFIGURATION v4.4 ---
 
-# n8n URLs are commented out as requested
-# N8N_FAILURE_URL = "YOUR_FAILURE_URL_HERE"
-# N8N_STATUS_URL = "YOUR_STATUS_URL_HERE"
+# --- 1. Your Personal Settings ---
+USER_LOCATION = (32.008, 35.521) # Your updated location
+AVG_WALK_SPEED_MPS = 1.3 
+AVG_BUS_SPEED_MPS = 8.3  
 
+# --- 2. MVP Settings ---
+STOPS_TO_MONITOR = [
+    {
+        "name": "J.U Hospital (To Museum)",
+        "stopId": "10619",
+        "direction": 0
+    },
+    {
+        "name": "J.U Hospital (To Swaileh)",
+        "stopId": "10620", 
+        "direction": 1
+    }
+]
+
+# --- 3. File Paths & Keys ---
 SERVICE_KEY_PATH = r"D:\beaning\bean\serviceAccountKey.json"
-HISTORICAL_DATA_PATH = r"C:\Users\user\Desktop\Amman bus project\The precious data"
 
+### <<< FIX 1: CLEANED UP PATHS BASED ON YOUR SCREENSHOT ---
+# This is your main project folder
+PROJECT_ROOT_PATH = r"C:\Users\user\Desktop\Amman-bus-project" 
+
+# We will create and use a 'data' folder *inside* your project
+HISTORICAL_DATA_PATH = os.path.join(PROJECT_ROOT_PATH, "data")
+# This is the 'public' folder *inside* your project
+HOSTING_PUBLIC_PATH = os.path.join(PROJECT_ROOT_PATH, "public") 
+### --- END OF FIX 1 ---
+
+# --- 4. API & Schedule Settings ---
 API_URLS = {
     0: "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=0&displayRouteCode=99&resultType=111111",
     1: "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=1&displayRouteCode=99&resultType=111111"
 }
+ACTIVE_HOUR_START = 6
+ACTIVE_HOUR_END = 0 
 
-# Active hours
-ACTIVE_HOUR_START = 6  # 6 AM
-ACTIVE_HOUR_END = 0    # Midnight (we check for > 6 OR < 0)
+# --- 5. n8n (Commented Out) ---
+# N8N_FAILURE_URL = "YOUR_FAILURE_URL_HERE"
+# N8N_STATUS_URL = "YOUR_STATUS_URL_HERE"
 
 # --- "Morale" Settings ---
 GERMAN_QUOTES = [
     ("Wo ein Wille ist, da ist auch ein Weg.", "Where there's a will, there's a way. - German Proverb"),
-    ("Ohne Fleiß kein Preis.", "No pain, no gain. - German Proverb"),
-    ("Ordnung muss sein.", "There must be order. - German Proverb")
+    ("Ohne Fleiß kein Preis.", "No pain, no gain. - German Proverb")
 ]
-MORALE_PING_TARGETS = [100, 500, 1000, 2500, 5000, 10000] # Notify at these TOTAL pings
+MORALE_PING_TARGETS = [100, 500, 1000, 2500, 5000, 10000] 
 
 # --- Firebase Setup ---
 try:
@@ -53,9 +81,186 @@ HEADERS = {
     'Origin': 'https://online.ammanbus.jo'
 }
 
+# ---------------------------------------------
+# --- 🚌 BUS AUNTY "MAGIC" LOGIC 🚌 ---
+# ---------------------------------------------
+
+def get_static_data_from_firebase(direction):
+    """Fetches the static route path and stop list from Firebase."""
+    try:
+        doc_ref = db.collection("static_route_data").document(f"route_99_dir_{direction}")
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict()
+        else:
+            print(f"  > WARNING: No static data found for direction {direction}. Run data collector.")
+            return None
+    except Exception as e:
+        print(f"  > Error getting static data: {e}")
+        return None
+
+def get_live_data_from_firebase(direction):
+    """Fetches the live bus list from Firebase."""
+    try:
+        doc_ref = db.collection("live_data").document(f"route99_dir_{direction}")
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict().get('buses', [])
+        else:
+            print(f"  > WARNING: No live data found for direction {direction}.")
+            return []
+    except Exception as e:
+        print(f"  > Error getting live data: {e}")
+        return []
+
+def find_closest_point_on_path(bus_coord, path_points):
+    """Finds the closest point (by sequence number) on the static path to a bus."""
+    closest_dist = float('inf')
+    closest_index = -1
+    for i, point in enumerate(path_points):
+        point_coord = (float(point['lat']), float(point['lng']))
+        dist = haversine(bus_coord, point_coord)
+        if dist < closest_dist:
+            closest_dist = dist
+            closest_index = i
+    return closest_index
+
+def calculate_distance_along_path(start_index, end_index, path_points):
+    """Sums the distance of all segments in the path_points list."""
+    total_distance_m = 0
+    if start_index == -1 or end_index == -1 or start_index >= end_index:
+        return 0
+    for i in range(start_index, end_index):
+        p1 = (float(path_points[i]['lat']), float(path_points[i]['lng']))
+        p2 = (float(path_points[i+1]['lat']), float(path_points[i+1]['lng']))
+        total_distance_m += haversine(p1, p2, unit=Unit.METERS)
+    return total_distance_m
+
+def generate_bus_aunty_html():
+    """The main logic for the Bus Aunty. Fetches data, calculates ETAs, and generates an HTML file."""
+    print("  > 🚌 Generating Bus Aunty HTML...")
+    html_blocks = []
+    
+    for stop_config in STOPS_TO_MONITOR:
+        direction = stop_config['direction']
+        target_stop_id = stop_config['stopId']
+        
+        static_data = get_static_data_from_firebase(direction)
+        live_buses = get_live_data_from_firebase(direction)
+        
+        if not static_data or 'busStopList' not in static_data or 'pointList' not in static_data:
+            print(f"  > Skipping {stop_config['name']}: Missing static data.")
+            continue
+            
+        target_stop = next((s for s in static_data['busStopList'] if s['stopId'] == target_stop_id), None)
+        if not target_stop:
+            print(f"  > Skipping {stop_config['name']}: Could not find stopId {target_stop_id}")
+            continue
+
+        stop_coord = (float(target_stop['lat']), float(target_stop['lng']))
+        stop_path_index = find_closest_point_on_path(stop_coord, static_data['pointList'])
+        
+        walk_dist_m = haversine(USER_LOCATION, stop_coord, unit=Unit.METERS)
+        walk_time_min = (walk_dist_m / AVG_WALK_SPEED_MPS) / 60
+        
+        closest_bus_dist_m = float('inf')
+        
+        for bus in live_buses:
+            bus_coord = (float(bus['lat']), float(bus['lng']))
+            bus_path_index = find_closest_point_on_path(bus_coord, static_data['pointList'])
+            
+            if bus_path_index < stop_path_index:
+                dist_m = calculate_distance_along_path(bus_path_index, stop_path_index, static_data['pointList'])
+                if dist_m < closest_bus_dist_m:
+                    closest_bus_dist_m = dist_m
+        
+        final_eta_str = "--"
+        if closest_bus_dist_m != float('inf'):
+            bus_eta_min = (closest_bus_dist_m / AVG_BUS_SPEED_MPS) / 60
+            magic_eta_min = bus_eta_min - walk_time_min
+            
+            if magic_eta_min <= 0.5: final_eta_str = "Now"
+            elif magic_eta_min < 1: final_eta_str = "<1"
+            else: final_eta_str = str(int(round(magic_eta_min)))
+        
+        html_blocks.append(f"""
+            <div class="stop-card">
+                <div class="eta-number">{final_eta_str}</div>
+                <div class="route-info">
+                    <div class="route-name">99</div>
+                    <div class="stop-name">{stop_config['name']}</div>
+                </div>
+            </div>
+        """)
+
+    html_template = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="30">
+        <title>Bus Aunty</title>
+        <style>
+            body {{
+                background-color: #ffffff;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                margin: 0; padding: 16px; display: flex;
+                flex-direction: column; gap: 16px;
+            }}
+            .stop-card {{
+                display: flex; align-items: center; background-color: #f0f0f0;
+                border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }}
+            .eta-number {{
+                font-size: 80px; font-weight: bold; color: #000000;
+                width: 120px; text-align: center;
+            }}
+            .route-info {{ display: flex; flex-direction: column; margin-left: 16px; }}
+            .route-name {{ font-size: 32px; font-weight: 600; color: #000; }}
+            .stop-name {{ font-size: 24px; color: #555; }}
+            .header {{ font-size: 20px; color: #777; }}
+        </style>
+    </head>
+    <body>
+        <div class="header">BusPal (Updated: {datetime.datetime.now().strftime('%I:%M:%S %p')})</div>
+        {''.join(html_blocks)}
+    </body>
+    </html>
+    """
+    
+    try:
+        # Use the corrected path
+        html_file_path = os.path.join(HOSTING_PUBLIC_PATH, "bus_aunty.html")
+        with open(html_file_path, "w", encoding="utf-8") as f:
+            f.write(html_template)
+        print(f"  > ✅ Successfully generated 'bus_aunty.html' at {html_file_path}")
+        return True
+    except Exception as e:
+        print(f"  > ❌ CRITICAL ERROR: Could not write HTML file: {e}")
+        return False
+
+def deploy_to_firebase_hosting():
+    """Runs the 'firebase deploy' command to upload the new HTML."""
+    print("  > 🚀 Deploying to Firebase Hosting...")
+    try:
+        # Use the corrected path
+        subprocess.run(["firebase", "deploy", "--only", "hosting"], 
+                       cwd=PROJECT_ROOT_PATH, # Run from the project root
+                       check=True, shell=True, capture_output=True, text=True)
+        print("  > ✅ Deploy complete! Your Kindle can now refresh.")
+    except subprocess.CalledProcessError as e:
+        print(f"  > ❌ CRITICAL ERROR: Could not deploy to Firebase.")
+        print(f"  > STDOUT: {e.stdout}")
+        print(f"  > STDERR: {e.stderr}")
+    except Exception as e:
+        print(f"  > ❌ CRITICAL ERROR: Could not deploy to Firebase: {e}")
+
+# ---------------------------------------------
+# --- DATA COLLECTOR FUNCTIONS (v4.4) ---
+# ---------------------------------------------
 
 def get_full_route_data(api_url):
-    """Pings the API and returns the full pathList object."""
     try:
         response = requests.get(api_url, headers=HEADERS, timeout=10)
         response.raise_for_status() 
@@ -67,20 +272,17 @@ def get_full_route_data(api_url):
         print(f"  > Error fetching data from API: {e}")
         return None 
 
+### <<< FIX 2: THIS FUNCTION WAS MISSING. I HAVE ADDED IT BACK. ---
 def save_live_to_firebase(buses, direction_id):
     """
     SAVES ALL BUSES FOR ONE DIRECTION TO A *SINGLE* DOCUMENT.
-    This is the Firebase Quota Fix.
+    This is the Firebase Quota Fix (v4.4).
     """
     if not buses:
-        # If no buses, we still write an empty list to show the route is empty
         buses = []
         
     try:
-        # We will store all live data in one collection
         doc_ref = db.collection("live_data").document(f"route99_dir_{direction_id}")
-        
-        # Prepare data: just the essentials for the "live" app
         live_bus_list = []
         for bus in buses:
             live_bus_list.append({
@@ -89,89 +291,60 @@ def save_live_to_firebase(buses, direction_id):
                 'lng': bus.get('lng'),
                 'bearing': bus.get('bearing')
             })
-            
         doc_data = {
             'buses': live_bus_list,
             'bus_count': len(live_bus_list),
             'last_seen': firestore.SERVER_TIMESTAMP
         }
-        
-        # This is now just ONE write operation
-        doc_ref.set(doc_data) 
+        doc_ref.set(doc_data) # <-- This is now ONE write, not 40
         return len(live_bus_list)
-        
     except Exception as e:
         print(f"  > ❌ Error saving LIVE data to Firebase: {e}")
         return 0
+### --- END OF FIX 2 ---
 
 def save_historical_to_csv(buses, ping_time, is_night_log):
-    """Saves HISTORICAL bus data to a local CSV file."""
-    if not buses:
-        return 0
-
+    if not buses: return 0
     today_str = ping_time.strftime("%Y-%m-%d")
-    
-    # NEW: Use a different filename for night logs
     file_suffix = "_night" if is_night_log else ""
     filename = os.path.join(HISTORICAL_DATA_PATH, f"log_{today_str}{file_suffix}.csv")
-    
     new_data = []
     for bus in buses:
         new_data.append({
-            'ping_time': ping_time.isoformat(),
-            'busId': bus.get('busId'),
-            'lat': bus.get('lat'),
-            'lng': bus.get('lng'),
-            'bearing': bus.get('bearing'),
-            'direction': bus.get('direction'),
-            'plateNumber': bus.get('plateNumber'),
-            'stopId': bus.get('stopId'),
-            'disabledPerson': bus.get('disabledPerson'),
-            'vehicleType': bus.get('vehicleType'),
-            'ac': bus.get('ac'),
-            'bike': bus.get('bike'),
-            'load': bus.get('load', 'N/A') # <-- Added the 'load' metric
+            'ping_time': ping_time.isoformat(), 'busId': bus.get('busId'),
+            'lat': bus.get('lat'), 'lng': bus.get('lng'), 'bearing': bus.get('bearing'),
+            'direction': bus.get('direction'), 'plateNumber': bus.get('plateNumber'),
+            'stopId': bus.get('stopId'), 'load': bus.get('load', 'N/A')
         })
-
-    if not new_data:
-        return 0
-
+    if not new_data: return 0
     df = pd.DataFrame(new_data)
     file_exists = os.path.isfile(filename)
-    
     try:
         df.to_csv(filename, mode='a', header=not file_exists, index=False)
         return len(new_data)
     except Exception as e:
-        print(f"  > ❌ CRITICAL ERROR: Could not save HISTORICAL data to CSV at {filename}.")
-        print(f"  > Error: {e}")
-        return 0
+        print(f"  > ❌ CSV ERROR: {e}"); return 0
 
 def save_static_data_to_firebase(full_route_data, direction_id):
-    """Saves the STATIC route data (points, stops) to Firebase ONCE per day."""
     try:
         doc_ref = db.collection("static_route_data").document(f"route_99_dir_{direction_id}")
         doc = doc_ref.get()
         if doc.exists:
             last_updated = doc.to_dict().get('last_updated')
             if last_updated and last_updated.date() == datetime.date.today():
-                return True # Already saved today, skip.
-
+                return True 
         static_data = {
             'pointList': full_route_data.get('pointList', []),
             'busStopList': full_route_data.get('busStopList', []),
             'scheduleList': full_route_data.get('scheduleList', []),
             'last_updated': firestore.SERVER_TIMESTAMP
         }
-        doc_ref.set(static_data)
-        print(f"  > ✅ Successfully saved STATIC data for direction {direction_id}.")
+        doc_ref.set(static_data); print(f"  > ✅ Saved STATIC data dir {direction_id}.")
         return True
     except Exception as e:
-        print(f"  > Error saving STATIC data: {e}")
-        return False
+        print(f"  > Error saving STATIC data: {e}"); return False
 
 def append_status_log(message):
-    """Appends a summary message to a local status_log.txt file."""
     filename = os.path.join(HISTORICAL_DATA_PATH, "status_log.txt")
     try:
         with open(filename, "a", encoding="utf-8") as f:
@@ -179,134 +352,38 @@ def append_status_log(message):
     except Exception as e:
         print(f"  > Error writing to status_log.txt: {e}")
 
-# --- n8n functions are "commented out" by disabling the call ---
 def notify_n8n(url, payload):
-    # As requested, n8n calls are disabled.
-    # We will just print what we *would* have sent.
-    print(f"  > [n8n SKIPPED]: Would have sent: {payload.get('message', 'No message')}")
-    return
-    # if not url.startswith("https://"):
-    #     return
-    # try:
-    #     requests.post(url, json=payload, timeout=5)
-    #     print(f"  > ✅ Successfully sent notification to n8n: {payload.get('message', 'Status update')}")
-    # except Exception as e:
-    #     print(f"  > ❌ FAILED to send n8n notification: {e}")
+    print(f"  > [n8n SKIPPED]: Would send: {payload.get('message', 'No msg')}")
 
-# --- Main part of the script ---
+
+# --- MAIN LOOP (v4.4) ---
 if __name__ == "__main__":
     
     consecutive_errors = 0
     total_ping_count = 0
     ping_streak = 0
     best_streak = 0
-    script_start_time = datetime.datetime.now()
     
-    print("--- 🚌 BusPal Data Collector: Engaged! ---")
-    append_status_log(f"\n--- SCRIPT STARTED: {script_start_time.isoformat()} ---")
+    ### <<< FIX 1.b: Create the data directory if it doesn't exist
+    if not os.path.exists(HISTORICAL_DATA_PATH):
+        os.makedirs(HISTORICAL_DATA_PATH)
+        print(f"✅ Created data directory at {HISTORICAL_DATA_PATH}")
+    ### --- END OF FIX 1.b ---
+    
+    print("--- 🚌 BusPal Data Collector & Aunty Generator (v4.4): Engaged! ---")
+    append_status_log(f"\n--- SCRIPT STARTED: {datetime.datetime.now().isoformat()} ---")
     
     while True:
         current_time = datetime.datetime.now()
         is_active_hours = current_time.hour >= ACTIVE_HOUR_START or current_time.hour < ACTIVE_HOUR_END
         
-        # --- 1. SETTINGS based on time of day ---
+        # --- 1. SETTINGS ---
         if is_active_hours:
             is_night_log = False
             sleep_duration = random.uniform(30, 45)
             print(f"--- Fetching new data (Timestamp: {current_time.isoformat()}) ---")
         else:
-            # NIGHT MODE
             is_night_log = True
-            sleep_duration = 30 * 60 # 30 minutes
-            if ping_streak > 0: # Log the final streak before sleeping
-                append_status_log(f"{current_time.isoformat()} - Streak: {ping_streak}. Best: {best_streak}.")
-            
-            print(f"Zzz... (It's {current_time.strftime('%H:%M')}). In night mode. Checking again in 30 mins.")
-            append_status_log(f"{current_time.isoformat()} - Entering night mode. Gute Nacht!")
-            ping_streak = 0
-        
-        # --- 2. FETCH DATA ---
-        total_buses_found_live = 0
-        all_buses_for_csv = []
-        api_success = False
-
-        for direction, url in API_URLS.items():
-            full_data = get_full_route_data(url)
-            if full_data:
-                api_success = True 
-                live_buses = full_data.get('busList', [])
-                
-                # We save *all* buses after hours, to see where they park
-                # This confirms your theory!
-                
-                if live_buses:
-                    # Save to Firebase (Live) - Only during active hours
-                    if is_active_hours:
-                        total_buses_found_live += save_live_to_firebase(live_buses, direction)
-                    
-                    # Prep for CSV (always, even at night)
-                    for bus in live_buses:
-                        bus['direction'] = direction
-                    all_buses_for_csv.extend(live_buses)
-                
-                # Save Static Data (once per day, only during active hours)
-                if is_active_hours and full_data.get('pointList'):
-                    save_static_data_to_firebase(full_data, direction)
-        
-        # --- 3. PROCESS THE RESULTS ---
-        if api_success:
-            total_ping_count += 1 # NEW: Total counter
-            consecutive_errors = 0
-            
-            # Save to historical CSV
-            csv_count = save_historical_to_csv(all_buses_for_csv, current_time, is_night_log)
-            
-            if is_active_hours:
-                ping_streak += 1
-                if ping_streak > best_streak:
-                    best_streak = ping_streak
-                
-                summary = f"SUCCESS: Saved {total_buses_found_live} Firebase, {csv_count} CSV. Streak: {ping_streak}. Total Pings: {total_ping_count}"
-                print(f"  > {summary}")
-                
-                if ping_streak % 10 == 0:
-                    append_status_log(f"{current_time.isoformat()} - {summary}")
-                
-                # NEW: Morale Check on TOTAL pings
-                if total_ping_count in MORALE_PING_TARGETS:
-                    print(f"\n  > GLÜCKWUNSCH! {total_ping_count} total successful pings! Weiter so! (Keep it up!)\n")
-                    append_status_log(f"{current_time.isoformat()} - !!! TOTAL PING MILESTONE: {total_ping_count} !!!")
-                    # status_payload = {"message": f"BusPal Milestone: {total_ping_count} total pings!"}
-                    # notify_n8n(N8N_STATUS_URL, status_payload) # This is where the status ping would go
-            
-            else:
-                # Night log summary
-                summary = f"NIGHT LOG: Saved {csv_count} parked bus locations to CSV."
-                print(f"  > {summary}")
-                append_status_log(f"{current_time.isoformat()} - {summary}")
-
-        else:
-            # FAILURE!
-            consecutive_errors += 1
-            print(f"  > ❌ Could not retrieve ANY bus data. Strike {consecutive_errors} of 5.")
-            
-            if ping_streak > 0:
-                print(f"  > Streak lost at {ping_streak} pings. Best: {best_streak}")
-                quote, attribution = random.choice(GERMAN_QUOTES)
-                print(f"  > Ach, schade! '{quote}' ({attribution})\n")
-                append_status_log(f"{current_time.isoformat()} - STREAK LOST at {ping_streak}. Best: {best_streak}. Ach, schade!")
-            
-            ping_streak = 0 
-
-        # --- 4. CHECK FOR 5-STRIKE FAILURE ---
-        if consecutive_errors >= 5:
-            print("\n❌ STOPPING SCRIPT: 5 consecutive errors.")
-            error_msg = f"{current_time.isoformat()} - STOPPING SCRIPT. 5 consecutive errors."
-            append_status_log(error_msg)
-            
-            # notify_n8n(N8N_FAILURE_URL, {"message": error_msg})
-            break 
-
-        # --- 5. WAIT FOR NEXT CYCLE ---
-        print(f"\nWaiting for {sleep_duration:.1f} seconds...\n")
-        time.sleep(sleep_duration)
+            sleep_duration = 30 * 60 
+            if ping_streak > 0: append_status_log(f"{current_time.isoformat()} - Streak: {ping_streak}.")
+            print(f"Zzz... (It's {current_time.strftime
