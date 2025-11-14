@@ -72,8 +72,10 @@ def download_animation_library():
 def build_map_with_live_javascript():
     print("--- 🗺️ Building Live Interpolation Map (v1.2) ---")
     
+    # 1. Create a base map
     m = folium.Map(location=[31.97, 35.89], zoom_start=13)
     
+    # 2. Add the static paths and stops to the map
     for direction in [0, 1]:
         static_data = get_static_data_from_firebase(direction)
         color = 'blue' if direction == 0 else 'green'
@@ -82,17 +84,32 @@ def build_map_with_live_javascript():
             path_points = [(float(p['lat']), float(p['lng'])) for p in static_data['pointList']]
             folium.PolyLine(path_points, color=color, weight=5, opacity=0.7, popup=f"Direction {direction}").add_to(m)
 
+        # --- THIS IS THE CORRECTED INDENTATION ---
+        # This code block is now INSIDE the 'for' loop
         if static_data and 'busStopList' in static_data:
+            # --- CUSTOM ICON CODE ---
+            # Make sure this file is in your 'public' folder
+            stop_icon_url = "bus-stop-icon-vector-illustration_1147484-8520.avif" 
             for stop in static_data['busStopList']:
-                folium.CircleMarker(
+                icon = folium.features.CustomIcon(
+                    stop_icon_url,
+                    icon_size=(30, 30), # (width, height)
+                    icon_anchor=(15, 15) # center
+                )
+                folium.Marker(
                     location=[float(stop['lat']), float(stop['lng'])],
-                    radius=5, color=color, fill=True, fill_color=color,
+                    icon=icon,
                     popup=f"STOP: {stop['stopName']} (ID: {stop['stopId']})"
                 ).add_to(m)
+        # --- END OF INDENTATION FIX ---
 
+    # 3. Save the base map to a string (This is OUTSIDE the loop)
     map_html_string = m.get_root().render()
+
+    # 4. Get Firebase config
     firebase_config_string = json.dumps(FIREBASE_CONFIG_OBJECT)
 
+    # 5. Define the JavaScript block
     javascript_block = f"""
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -117,10 +134,12 @@ def build_map_with_live_javascript():
             }} else {{
                 console.log(`Creating new marker for bus ${{busId}}`);
                 const icon = L.divIcon({{
-                    html: `<i class="fa fa-bus" style="color: white; font-size: 16px; text-shadow: 0 0 3px #000;"></i>`,
-                    className: `bus-icon dir-${{direction}}`,
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
+                    // --- CUSTOM BUS ICON ---
+                    // Make sure this file is in your 'public' folder
+                    html: `<img src="Screenshot 2025-11-14 150909.png" style="width: 30px; height: 30px;">`,
+                    className: '', // We don't need the extra CSS
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
                 }});
                 busMarkers[busId] = L.animatedMarker([pos, pos], {{
                     icon: icon,
@@ -148,37 +167,21 @@ def build_map_with_live_javascript():
             }});
         }}
         
-        // --- 4. ADD FONT AWESOME (for the bus icon) ---
-        var faLink = document.createElement('link');
-        faLink.setAttribute('rel', 'stylesheet');
-        faLink.setAttribute('href', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-        document.head.appendChild(faLink);
-        
-        // --- 5. ADD CUSTOM CSS FOR THE ICON ---
-        var style = document.createElement('style');
-        style.innerHTML = `
-            .bus-icon {{
-                background-color: #333; border: 2px solid white; border-radius: 50%;
-                box-shadow: 0 0 5px rgba(0,0,0,0.5); display: flex;
-                justify-content: center; align-items: center;
-            }}
-            .bus-icon.dir-0 {{ background-color: #0078FF; }} /* Blue */
-            .bus-icon.dir-1 {{ background-color: #00A86B; }} /* Green */
-        `;
-        document.head.appendChild(style);
-
-        // --- 6. START THE LISTENERS ---
+        // --- 4. START THE LISTENERS ---
         setTimeout(() => {{
             const map = {m.get_name()}; // Get the Folium map variable
             console.log("Map loaded. Starting listeners...");
             listenForBuses(0);
             listenForBuses(1);
         }}, 1000); // Wait 1 second for the map to load
+
     </script>
     """
 
+    # 6. Inject the JavaScript into the HTML
     final_html = map_html_string.replace("</body>", f"{javascript_block}</body>")
 
+    # 7. Save the final HTML file
     map_path = os.path.join(HOSTING_PUBLIC_PATH, HTML_FILENAME)
     with open(map_path, "w", encoding="utf-8") as f:
         f.write(final_html)
