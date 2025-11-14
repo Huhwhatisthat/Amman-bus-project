@@ -425,7 +425,7 @@ if __name__ == "__main__":
                 summary = f"SUCCESS: Saved {total_buses_found_live} Firebase, {csv_count} CSV. Streak: {ping_streak}. Total Pings: {total_ping_count}"
                 print(f"  > {summary}")
                 
-                if ping_streak % 10 == 0: append_status_log(summary)
+                if ping_streak % 10 == 0: append_status_log(f"{current_time.isoformat()} - {summary}")
                 
                 # --- 4. GENERATE & DEPLOY BUS AUNTY (NEW!) ---
                 if generate_bus_aunty_html():
