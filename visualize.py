@@ -4,7 +4,7 @@ import folium
 import os
 import subprocess
 import json
-import requests # <-- NEW: We need this to download the animation file
+import requests 
 
 # --- CONFIGURATION ---
 SERVICE_KEY_PATH = r"D:\beaning\bean\serviceAccountKey.json"
@@ -40,13 +40,16 @@ except FileNotFoundError:
 def get_static_data_from_firebase(direction):
     """Fetches the static route path and stop list from Firebase."""
     doc_ref = db.collection("static_route_data").document(f"route_99_dir_{direction}")
+    
+    ### <<< FIX: This was the typo 'doc_get()' is now 'doc_ref.get()' ---
     doc = doc_ref.get()
+    ### --- END OF FIX ---
+    
     if doc.exists:
         return doc.to_dict()
     print(f"  > WARNING: No static data found for direction {direction}.")
     return None
 
-### <<< FIX 1: Automatically downloads the animation library ---
 def download_animation_library():
     """Downloads the JS file for animation and saves it to the public folder."""
     save_path = os.path.join(HOSTING_PUBLIC_PATH, ANIMATION_JS_FILENAME)
@@ -65,15 +68,12 @@ def download_animation_library():
     except Exception as e:
         print(f"  > ❌ FAILED to download animation library: {e}")
         return False
-### --- END OF FIX 1 ---
 
 def build_map_with_live_javascript():
-    print("--- 🗺️ Building Live Interpolation Map (v1.1) ---")
+    print("--- 🗺️ Building Live Interpolation Map (v1.2) ---")
     
-    # 1. Create a base map
     m = folium.Map(location=[31.97, 35.89], zoom_start=13)
     
-    # 2. Add the static paths and stops to the map
     for direction in [0, 1]:
         static_data = get_static_data_from_firebase(direction)
         color = 'blue' if direction == 0 else 'green'
@@ -90,15 +90,9 @@ def build_map_with_live_javascript():
                     popup=f"STOP: {stop['stopName']} (ID: {stop['stopId']})"
                 ).add_to(m)
 
-    # 3. Save the base map to a string (so we can inject JS)
     map_html_string = m.get_root().render()
-
-    ### <<< FIX 2: Correctly injects the Firebase config as a JSON string ---
-    # We use json.dumps() to convert the Python dict to a perfect JavaScript object string
     firebase_config_string = json.dumps(FIREBASE_CONFIG_OBJECT)
-    ### --- END OF FIX 2 ---
 
-    # 4. Define the JavaScript to inject
     javascript_block = f"""
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -106,9 +100,7 @@ def build_map_with_live_javascript():
     
     <script>
         // --- 1. INITIALIZE FIREBASE ---
-        // This config is now a valid JavaScript object
         const firebaseConfig = {firebase_config_string};
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         console.log("Firebase Initialized!");
@@ -130,7 +122,6 @@ def build_map_with_live_javascript():
                     iconSize: [24, 24],
                     iconAnchor: [12, 12]
                 }});
-
                 busMarkers[busId] = L.animatedMarker([pos, pos], {{
                     icon: icon,
                     title: `Bus ${{busId}}`
@@ -183,14 +174,11 @@ def build_map_with_live_javascript():
             listenForBuses(0);
             listenForBuses(1);
         }}, 1000); // Wait 1 second for the map to load
-
     </script>
     """
 
-    # 5. Inject the JavaScript into the HTML
     final_html = map_html_string.replace("</body>", f"{javascript_block}</body>")
 
-    # 6. Save the final HTML file
     map_path = os.path.join(HOSTING_PUBLIC_PATH, HTML_FILENAME)
     with open(map_path, "w", encoding="utf-8") as f:
         f.write(final_html)
