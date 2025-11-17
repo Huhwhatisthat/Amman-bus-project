@@ -126,3 +126,291 @@ SUCCESS: Saved 15 Firebase, 15 CSV. Streak: 420. Total Pings: 552
 2025-11-14T15:13:00.646536 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 330. Total Pings: 330
 2025-11-14T15:20:13.142329 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 340. Total Pings: 340
 2025-11-14T15:27:11.938197 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 350. Total Pings: 350
+2025-11-14T15:34:35.870241 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 360. Total Pings: 360
+2025-11-14T15:41:38.574435 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 370. Total Pings: 370
+2025-11-14T15:49:08.865847 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 380. Total Pings: 380
+2025-11-14T15:56:22.691248 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 390. Total Pings: 390
+2025-11-14T16:03:37.452428 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 400. Total Pings: 400
+2025-11-14T16:10:32.781096 - SUCCESS: Saved 15 Firebase, 15 CSV. Streak: 410. Total Pings: 410
+2025-11-14T16:18:06.218377 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 420. Total Pings: 420
+2025-11-14T16:25:24.698188 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 430. Total Pings: 430
+2025-11-14T16:32:58.793078 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 440. Total Pings: 440
+2025-11-14T16:39:52.394924 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 450. Total Pings: 450
+2025-11-14T16:47:25.939495 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 460. Total Pings: 460
+2025-11-14T16:54:16.045373 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 470. Total Pings: 470
+2025-11-14T17:01:35.256090 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 480. Total Pings: 480
+2025-11-14T17:08:38.259554 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 490. Total Pings: 490
+2025-11-14T17:15:56.456464 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 500. Total Pings: 500
+2025-11-14T17:15:56.456464 - !!! MILESTONE: 500 pings !!!
+2025-11-14T17:23:03.797442 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 510. Total Pings: 510
+2025-11-14T17:30:19.643649 - SUCCESS: Saved 15 Firebase, 15 CSV. Streak: 520. Total Pings: 520
+2025-11-14T17:37:20.196142 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 530. Total Pings: 530
+2025-11-14T17:43:55.683317 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 540. Total Pings: 540
+2025-11-14T17:51:10.394364 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 550. Total Pings: 550
+2025-11-14T17:58:30.039834 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 560. Total Pings: 560
+2025-11-14T18:05:20.878222 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 570. Total Pings: 570
+2025-11-14T18:12:27.783328 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 580. Total Pings: 580
+2025-11-14T18:19:43.902858 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 590. Total Pings: 590
+2025-11-14T18:26:36.256372 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 600. Total Pings: 600
+2025-11-14T18:33:47.479416 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 610. Total Pings: 610
+2025-11-14T18:40:54.961352 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 620. Total Pings: 620
+2025-11-14T18:48:01.881239 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 630. Total Pings: 630
+2025-11-14T18:55:23.853628 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 640. Total Pings: 640
+2025-11-14T19:02:28.883184 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 650. Total Pings: 650
+2025-11-14T19:09:23.428376 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 660. Total Pings: 660
+2025-11-14T19:16:31.355675 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 670. Total Pings: 670
+2025-11-14T19:23:33.038502 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 680. Total Pings: 680
+2025-11-14T19:32:54.733338 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 690. Total Pings: 690
+2025-11-14T19:40:28.054781 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 700. Total Pings: 700
+2025-11-14T19:47:28.133948 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 710. Total Pings: 710
+2025-11-14T19:54:23.306365 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 720. Total Pings: 720
+2025-11-14T20:01:07.374993 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 730. Total Pings: 730
+2025-11-14T20:08:24.321555 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 740. Total Pings: 740
+2025-11-14T20:15:21.948205 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 750. Total Pings: 750
+2025-11-14T20:22:17.236244 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 760. Total Pings: 760
+2025-11-14T20:29:27.919503 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 770. Total Pings: 770
+2025-11-14T20:36:45.623888 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 780. Total Pings: 780
+2025-11-14T20:43:51.481182 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 790. Total Pings: 790
+2025-11-14T20:50:59.075037 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 800. Total Pings: 800
+2025-11-14T20:58:18.886316 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 810. Total Pings: 810
+2025-11-14T21:05:23.440163 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 820. Total Pings: 820
+2025-11-14T21:12:43.802300 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 830. Total Pings: 830
+2025-11-14T21:19:35.076247 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 840. Total Pings: 840
+2025-11-14T21:26:57.072119 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 850. Total Pings: 850
+2025-11-14T21:34:27.411259 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 860. Total Pings: 860
+2025-11-14T21:41:37.502881 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 870. Total Pings: 870
+2025-11-14T21:48:52.653159 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 880. Total Pings: 880
+2025-11-14T21:55:50.772880 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 890. Total Pings: 890
+2025-11-14T22:03:18.059176 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 900. Total Pings: 900
+2025-11-14T22:10:08.414155 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 910. Total Pings: 910
+2025-11-14T22:17:35.691915 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 920. Total Pings: 920
+2025-11-14T22:24:34.488324 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 930. Total Pings: 930
+2025-11-14T22:31:52.326603 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 940. Total Pings: 940
+2025-11-14T22:38:58.803626 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 950. Total Pings: 950
+2025-11-14T22:45:59.581775 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 960. Total Pings: 960
+2025-11-14T22:53:23.342805 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 970. Total Pings: 970
+2025-11-14T23:00:03.998961 - SUCCESS: Saved 12 Firebase, 12 CSV. Streak: 980. Total Pings: 980
+2025-11-14T23:06:56.581740 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 990. Total Pings: 990
+2025-11-14T23:14:00.429808 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1000. Total Pings: 1000
+2025-11-14T23:14:00.429808 - !!! MILESTONE: 1000 pings !!!
+2025-11-14T23:20:40.577312 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1010. Total Pings: 1010
+2025-11-14T23:27:49.621051 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1020. Total Pings: 1020
+2025-11-14T23:35:24.749920 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1030. Total Pings: 1030
+2025-11-14T23:43:01.956723 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1040. Total Pings: 1040
+2025-11-14T23:50:26.398522 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1050. Total Pings: 1050
+2025-11-14T23:57:42.097127 - SUCCESS: Saved 16 Firebase, 16 CSV. Streak: 1060. Total Pings: 1060
+2025-11-15T00:00:33.063481 - Streak: 1063.
+2025-11-15T00:00:33.063481 - Entering night mode. Gute Nacht!
+2025-11-15T00:00:33.063481 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T00:30:35.614759 - Entering night mode. Gute Nacht!
+2025-11-15T00:30:35.614759 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T01:00:38.184440 - Entering night mode. Gute Nacht!
+2025-11-15T01:00:38.184440 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T01:30:40.719760 - Entering night mode. Gute Nacht!
+2025-11-15T01:30:40.719760 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T02:00:43.177317 - Entering night mode. Gute Nacht!
+2025-11-15T02:00:43.177317 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T02:30:45.837310 - Entering night mode. Gute Nacht!
+2025-11-15T02:30:45.837310 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T03:00:48.275060 - Entering night mode. Gute Nacht!
+2025-11-15T03:00:48.275060 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T03:30:50.866810 - Entering night mode. Gute Nacht!
+2025-11-15T03:30:50.866810 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T04:00:53.274071 - Entering night mode. Gute Nacht!
+2025-11-15T04:00:53.274071 - NIGHT LOG: Saved 16 parked bus locations to CSV.
+2025-11-15T04:30:55.721591 - Entering night mode. Gute Nacht!
+2025-11-15T04:30:55.721591 - NIGHT LOG: Saved 0 parked bus locations to CSV.
+2025-11-15T05:00:58.157082 - Entering night mode. Gute Nacht!
+2025-11-15T05:00:58.157082 - NIGHT LOG: Saved 0 parked bus locations to CSV.
+2025-11-15T05:31:01.223237 - Entering night mode. Gute Nacht!
+2025-11-15T05:31:01.223237 - NIGHT LOG: Saved 1 parked bus locations to CSV.
+2025-11-15T06:07:53.099154 - SUCCESS: Saved 6 Firebase, 6 CSV. Streak: 10. Total Pings: 1085
+2025-11-15T06:15:15.421271 - SUCCESS: Saved 9 Firebase, 9 CSV. Streak: 20. Total Pings: 1095
+2025-11-15T06:22:50.143122 - SUCCESS: Saved 13 Firebase, 13 CSV. Streak: 30. Total Pings: 1105
+2025-11-15T06:30:02.603559 - SUCCESS: Saved 14 Firebase, 14 CSV. Streak: 40. Total Pings: 1115
+2025-11-15T06:37:13.170955 - SUCCESS: Saved 14 Firebase, 14 CSV. Streak: 50. Total Pings: 1125
+2025-11-15T06:44:23.747392 - SUCCESS: Saved 17 Firebase, 17 CSV. Streak: 60. Total Pings: 1135
+2025-11-15T06:51:29.525749 - SUCCESS: Saved 17 Firebase, 17 CSV. Streak: 70. Total Pings: 1145
+2025-11-15T06:58:49.562300 - SUCCESS: Saved 19 Firebase, 19 CSV. Streak: 80. Total Pings: 1155
+2025-11-15T07:06:10.576809 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 90. Total Pings: 1165
+2025-11-15T07:13:20.956384 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 100. Total Pings: 1175
+2025-11-15T07:20:14.715949 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 110. Total Pings: 1185
+2025-11-15T07:27:27.924619 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 120. Total Pings: 1195
+2025-11-15T07:34:30.360295 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 130. Total Pings: 1205
+2025-11-15T07:41:34.797101 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 140. Total Pings: 1215
+2025-11-15T07:48:31.037680 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 150. Total Pings: 1225
+2025-11-15T07:55:38.762771 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 160. Total Pings: 1235
+2025-11-15T08:02:41.836658 - SUCCESS: Saved 21 Firebase, 21 CSV. Streak: 170. Total Pings: 1245
+2025-11-15T08:09:43.086006 - SUCCESS: Saved 22 Firebase, 22 CSV. Streak: 180. Total Pings: 1255
+2025-11-15T08:16:51.766204 - SUCCESS: Saved 22 Firebase, 22 CSV. Streak: 190. Total Pings: 1265
+2025-11-15T08:24:21.561997 - SUCCESS: Saved 23 Firebase, 23 CSV. Streak: 200. Total Pings: 1275
+2025-11-15T08:31:24.292501 - SUCCESS: Saved 23 Firebase, 23 CSV. Streak: 210. Total Pings: 1285
+2025-11-15T08:38:31.316447 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 220. Total Pings: 1295
+2025-11-15T08:45:32.452444 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 230. Total Pings: 1305
+2025-11-15T08:52:51.983677 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 240. Total Pings: 1315
+2025-11-15T08:59:52.037205 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 250. Total Pings: 1325
+2025-11-15T09:07:00.353030 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 260. Total Pings: 1335
+2025-11-15T09:13:58.830000 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 270. Total Pings: 1345
+2025-11-15T09:21:14.048642 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 280. Total Pings: 1355
+2025-11-15T09:28:29.933750 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 290. Total Pings: 1365
+2025-11-15T09:35:47.855241 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 300. Total Pings: 1375
+2025-11-15T09:42:59.476816 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 310. Total Pings: 1385
+2025-11-15T09:50:18.686127 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 320. Total Pings: 1395
+2025-11-15T09:56:59.361136 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 330. Total Pings: 1405
+2025-11-15T10:03:41.125531 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 340. Total Pings: 1415
+2025-11-15T10:10:41.102479 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 350. Total Pings: 1425
+2025-11-15T10:18:01.155671 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 360. Total Pings: 1435
+2025-11-15T10:25:10.941064 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 370. Total Pings: 1445
+2025-11-15T10:32:11.230392 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 380. Total Pings: 1455
+2025-11-15T10:39:29.305841 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 390. Total Pings: 1465
+2025-11-15T10:46:46.838718 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 400. Total Pings: 1475
+2025-11-15T10:53:45.297965 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 410. Total Pings: 1485
+2025-11-15T11:00:47.045929 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 420. Total Pings: 1495
+2025-11-15T11:08:10.122215 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 430. Total Pings: 1505
+2025-11-15T11:15:41.341817 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 440. Total Pings: 1515
+2025-11-15T11:22:37.249612 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 450. Total Pings: 1525
+2025-11-15T11:29:51.228690 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 460. Total Pings: 1535
+2025-11-15T11:37:14.739782 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 470. Total Pings: 1545
+2025-11-15T11:44:24.279369 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 480. Total Pings: 1555
+2025-11-15T11:51:32.751098 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 490. Total Pings: 1565
+2025-11-15T11:58:35.469021 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 500. Total Pings: 1575
+2025-11-15T12:05:46.426085 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 510. Total Pings: 1585
+2025-11-15T12:13:00.813124 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 520. Total Pings: 1595
+2025-11-15T12:20:14.216780 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 530. Total Pings: 1605
+2025-11-15T12:27:21.680565 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 540. Total Pings: 1615
+2025-11-15T12:34:48.261624 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 550. Total Pings: 1625
+2025-11-15T12:41:46.394420 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 560. Total Pings: 1635
+2025-11-15T12:49:08.637849 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 570. Total Pings: 1645
+2025-11-15T12:56:37.070225 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 580. Total Pings: 1655
+2025-11-15T13:03:38.244616 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 590. Total Pings: 1665
+2025-11-15T13:11:12.665272 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 600. Total Pings: 1675
+2025-11-15T13:18:29.623062 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 610. Total Pings: 1685
+2025-11-15T13:25:26.468371 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 620. Total Pings: 1695
+2025-11-15T13:32:40.801886 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 630. Total Pings: 1705
+2025-11-15T13:39:34.815860 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 640. Total Pings: 1715
+2025-11-15T13:46:38.826876 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 650. Total Pings: 1725
+2025-11-15T13:54:01.697528 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 660. Total Pings: 1735
+2025-11-15T14:00:44.865508 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 670. Total Pings: 1745
+2025-11-15T14:07:47.792572 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 680. Total Pings: 1755
+2025-11-15T14:15:09.123710 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 690. Total Pings: 1765
+2025-11-15T14:22:09.205399 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 700. Total Pings: 1775
+2025-11-15T14:29:24.634258 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 710. Total Pings: 1785
+2025-11-15T14:36:25.384065 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 720. Total Pings: 1795
+2025-11-15T14:43:39.416913 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 730. Total Pings: 1805
+2025-11-15T14:50:24.629062 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 740. Total Pings: 1815
+2025-11-15T14:57:26.980109 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 750. Total Pings: 1825
+2025-11-15T15:04:46.144389 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 760. Total Pings: 1835
+2025-11-15T15:11:45.272427 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 770. Total Pings: 1845
+2025-11-15T15:18:40.241101 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 780. Total Pings: 1855
+2025-11-15T15:25:44.668014 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 790. Total Pings: 1865
+2025-11-15T15:32:59.607421 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 800. Total Pings: 1875
+2025-11-15T15:40:01.938695 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 810. Total Pings: 1885
+2025-11-15T15:47:48.689798 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 820. Total Pings: 1895
+2025-11-15T15:54:58.268978 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 830. Total Pings: 1905
+2025-11-15T16:02:07.015586 - SUCCESS: Saved 25 Firebase, 25 CSV. Streak: 840. Total Pings: 1915
+2025-11-15T16:09:12.426574 - SUCCESS: Saved 26 Firebase, 26 CSV. Streak: 850. Total Pings: 1925
+2025-11-15T16:16:43.323674 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 860. Total Pings: 1935
+2025-11-15T16:24:20.192962 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 870. Total Pings: 1945
+2025-11-15T16:31:20.181907 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 880. Total Pings: 1955
+2025-11-15T16:38:23.614883 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 890. Total Pings: 1965
+2025-11-15T16:46:00.521209 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 900. Total Pings: 1975
+2025-11-15T16:53:50.016120 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 910. Total Pings: 1985
+2025-11-15T17:00:25.284047 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 920. Total Pings: 1995
+2025-11-15T17:07:41.245845 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 930. Total Pings: 2005
+2025-11-15T17:14:42.904585 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 940. Total Pings: 2015
+2025-11-15T17:21:57.233813 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 950. Total Pings: 2025
+2025-11-15T17:29:18.648359 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 960. Total Pings: 2035
+2025-11-15T17:36:12.526494 - SUCCESS: Saved 27 Firebase, 27 CSV. Streak: 970. Total Pings: 2045
+2025-11-15T17:43:30.348906 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 980. Total Pings: 2055
+2025-11-15T17:50:34.577054 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 990. Total Pings: 2065
+2025-11-15T17:57:41.241263 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1000. Total Pings: 2075
+2025-11-15T18:05:00.029549 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1010. Total Pings: 2085
+2025-11-15T18:12:05.302665 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1020. Total Pings: 2095
+2025-11-15T18:19:02.291081 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1030. Total Pings: 2105
+2025-11-15T18:26:22.257105 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1040. Total Pings: 2115
+2025-11-15T18:33:41.577875 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1050. Total Pings: 2125
+2025-11-15T18:40:40.723490 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1060. Total Pings: 2135
+2025-11-15T18:47:57.320527 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1070. Total Pings: 2145
+2025-11-15T18:55:16.605903 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1080. Total Pings: 2155
+2025-11-15T19:02:09.696014 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1090. Total Pings: 2165
+2025-11-15T19:09:31.160895 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1100. Total Pings: 2175
+2025-11-15T19:16:29.429686 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1110. Total Pings: 2185
+2025-11-15T19:23:25.275826 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1120. Total Pings: 2195
+2025-11-15T19:31:06.764381 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1130. Total Pings: 2205
+2025-11-15T19:38:16.864778 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1140. Total Pings: 2215
+2025-11-15T19:45:40.642772 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1150. Total Pings: 2225
+2025-11-15T19:53:02.028759 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1160. Total Pings: 2235
+2025-11-15T20:00:08.936556 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1170. Total Pings: 2245
+2025-11-15T20:07:08.879234 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1180. Total Pings: 2255
+2025-11-15T20:14:13.984497 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1190. Total Pings: 2265
+2025-11-15T20:21:33.463442 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1200. Total Pings: 2275
+2025-11-15T20:28:28.987743 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1210. Total Pings: 2285
+2025-11-15T20:35:42.740191 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1220. Total Pings: 2295
+2025-11-15T20:43:02.948917 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1230. Total Pings: 2305
+2025-11-15T20:50:04.658536 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1240. Total Pings: 2315
+2025-11-15T20:57:18.674271 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 1250. Total Pings: 2325
+2025-11-15T20:58:00.668243 - STREAK LOST at 1250.
+2025-11-15T21:05:19.557390 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 10. Total Pings: 2335
+2025-11-15T21:12:22.566216 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 20. Total Pings: 2345
+2025-11-15T21:19:39.194858 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 30. Total Pings: 2355
+2025-11-15T21:26:27.194975 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 40. Total Pings: 2365
+2025-11-15T21:33:33.949675 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 50. Total Pings: 2375
+2025-11-15T21:40:54.595294 - SUCCESS: Saved 29 Firebase, 29 CSV. Streak: 60. Total Pings: 2385
+2025-11-15T21:48:06.439695 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 70. Total Pings: 2395
+2025-11-15T21:55:16.125585 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 80. Total Pings: 2405
+2025-11-15T22:02:17.159069 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 90. Total Pings: 2415
+2025-11-15T22:09:25.077042 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 100. Total Pings: 2425
+2025-11-15T22:16:31.881868 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 110. Total Pings: 2435
+2025-11-15T22:23:47.306171 - SUCCESS: Saved 28 Firebase, 28 CSV. Streak: 120. Total Pings: 2445
+2025-11-15T22:31:14.780306 - SUCCESS: Saved 29 Firebase, 29 CSV. Streak: 130. Total Pings: 2455
+2025-11-15T22:38:12.754926 - SUCCESS: Saved 29 Firebase, 29 CSV. Streak: 140. Total Pings: 2465
+2025-11-15T22:45:43.205520 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 150. Total Pings: 2475
+2025-11-15T22:52:48.585214 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 160. Total Pings: 2485
+2025-11-15T22:59:52.231822 - SUCCESS: Saved 30 Firebase, 30 CSV. Streak: 170. Total Pings: 2495
+2025-11-15T23:03:31.811242 - !!! MILESTONE: 2500 pings !!!
+2025-11-15T23:07:06.487877 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 180. Total Pings: 2505
+2025-11-15T23:14:22.719733 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 190. Total Pings: 2515
+2025-11-15T23:21:29.476995 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 200. Total Pings: 2525
+2025-11-15T23:28:08.098748 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 210. Total Pings: 2535
+2025-11-15T23:35:18.672906 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 220. Total Pings: 2545
+2025-11-15T23:42:14.548487 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 230. Total Pings: 2555
+2025-11-15T23:49:13.345298 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 240. Total Pings: 2565
+2025-11-15T23:56:05.800847 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 250. Total Pings: 2575
+2025-11-16T00:00:23.736255 - Streak: 255.
+2025-11-16T00:00:23.736255 - Entering night mode. Gute Nacht!
+2025-11-16T00:00:23.736255 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T00:30:26.268649 - Entering night mode. Gute Nacht!
+2025-11-16T00:30:26.268649 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T01:00:29.135838 - Entering night mode. Gute Nacht!
+2025-11-16T01:00:29.135838 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T01:30:31.986588 - Entering night mode. Gute Nacht!
+2025-11-16T01:30:31.986588 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T02:00:34.705974 - Entering night mode. Gute Nacht!
+2025-11-16T02:00:34.705974 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T02:30:37.402923 - Entering night mode. Gute Nacht!
+2025-11-16T02:30:37.402923 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T03:00:40.170296 - Entering night mode. Gute Nacht!
+2025-11-16T03:00:40.170296 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T03:30:42.914845 - Entering night mode. Gute Nacht!
+2025-11-16T03:30:42.914845 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T04:00:45.642648 - Entering night mode. Gute Nacht!
+2025-11-16T04:00:45.642648 - NIGHT LOG: Saved 31 parked bus locations to CSV.
+2025-11-16T04:30:48.482152 - Entering night mode. Gute Nacht!
+2025-11-16T04:30:48.482152 - NIGHT LOG: Saved 1 parked bus locations to CSV.
+2025-11-16T05:00:51.223699 - Entering night mode. Gute Nacht!
+2025-11-16T05:00:51.223699 - NIGHT LOG: Saved 1 parked bus locations to CSV.
+2025-11-16T05:30:54.136872 - Entering night mode. Gute Nacht!
+2025-11-16T05:30:54.136872 - NIGHT LOG: Saved 2 parked bus locations to CSV.
+2025-11-16T06:07:51.006597 - SUCCESS: Saved 13 Firebase, 13 CSV. Streak: 10. Total Pings: 2602
+2025-11-16T06:15:07.146873 - SUCCESS: Saved 14 Firebase, 14 CSV. Streak: 20. Total Pings: 2612
+2025-11-16T06:22:19.721712 - SUCCESS: Saved 20 Firebase, 20 CSV. Streak: 30. Total Pings: 2622
+2025-11-16T06:29:31.948660 - SUCCESS: Saved 22 Firebase, 22 CSV. Streak: 40. Total Pings: 2632
+2025-11-16T06:36:45.433165 - SUCCESS: Saved 24 Firebase, 24 CSV. Streak: 50. Total Pings: 2642
+2025-11-16T06:44:22.518932 - SUCCESS: Saved 26 Firebase, 26 CSV. Streak: 60. Total Pings: 2652
+2025-11-16T06:52:00.149959 - SUCCESS: Saved 29 Firebase, 29 CSV. Streak: 70. Total Pings: 2662
+2025-11-16T06:59:52.774842 - SUCCESS: Saved 31 Firebase, 31 CSV. Streak: 80. Total Pings: 2672
+2025-11-16T07:07:21.221458 - SUCCESS: Saved 32 Firebase, 32 CSV. Streak: 90. Total Pings: 2682
+2025-11-16T07:08:47.752306 - STREAK LOST at 91.
+2025-11-16T07:11:06.632815 - STREAK LOST at 2.
+2025-11-16T07:14:00.113102 - STREAK LOST at 3.
+2025-11-16T07:17:00.129373 - STOPPING SCRIPT. 5 consecutive errors.
