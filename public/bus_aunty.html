@@ -1,0 +1,85 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="30">
+        <title>Bus Aunty</title>
+        <style>
+            body {
+                background-color: #ffffff;
+                font-family: Helvetica, Arial, sans-serif;
+                margin: 0; padding: 10px;
+                height: 100vh;
+                box-sizing: border-box;
+                display: flex; 
+                flex-direction: row; /* Kindle Landscape */
+                gap: 10px;
+            }
+            .stop-card {
+                flex: 1; 
+                background-color: #f4f4f4;
+                border: 2px solid #000;
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                height: 90%;
+            }
+            .card-header {
+                display: flex; justify-content: space-between; align-items: center;
+                border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;
+            }
+            .stop-name { font-size: 1.2em; font-weight: bold; color: #333; }
+            .route-badge { 
+                background: #000; color: #fff; padding: 2px 6px; 
+                border-radius: 4px; font-weight: bold; 
+            }
+            .eta-container {
+                flex-grow: 1; display: flex; flex-direction: column;
+                justify-content: center; align-items: center;
+            }
+            .eta-main { font-size: 5em; font-weight: 800; line-height: 1; }
+            .eta-sub { font-size: 1em; color: #555; margin-top: 5px; font-weight: bold; }
+            .footer {
+                margin-top: auto; border-top: 1px solid #ccc; padding-top: 5px;
+                text-align: center; font-size: 0.9em; color: #444;
+            }
+            .timestamp { position: absolute; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; }
+        </style>
+    </head>
+    <body>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="stop-name">To Museum</span>
+                    <span class="route-badge">99</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(3 min ago)</div>
+                </div>
+                <div class="footer">
+                    Next: 0 min (L:?)
+                </div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="stop-name">To Swaileh</span>
+                    <span class="route-badge">99</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">4</div>
+                    <div class="eta-sub">mins to leave</div>
+                </div>
+                <div class="footer">
+                    Next: 5 min (L:?)
+                </div>
+            </div>
+        
+        <div class="timestamp">Updated: 07:56 PM</div>
+    </body>
+    </html>
+    
