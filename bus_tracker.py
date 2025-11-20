@@ -8,19 +8,19 @@ import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 from haversine import haversine, Unit
+import subprocess
 
-# --- CONFIGURATION v5.1 ---
+# --- CONFIGURATION v5.2 (Verbose Logs) ---
 
-# 1. YOUR LOCATION (Corrected)
+# 1. YOUR LOCATION
 USER_LOCATION = (32.00247, 35.87108) 
 AVG_WALK_SPEED_MPS = 1.3 
 AVG_BUS_SPEED_MPS = 8.3  
 
 # 2. MONITOR SETTINGS
-# !!! CHECK THE LOGS TO FIND THE CORRECT ID FOR DIRECTION 1 !!!
 STOPS_TO_MONITOR = [
     {"name": "To Museum", "stopId": "10619", "direction": 0},
-    {"name": "To Swaileh", "stopId": "10619", "direction": 1} # <--- VERIFY THIS ID IN LOGS
+    {"name": "To Swaileh", "stopId": "10619", "direction": 1} 
 ]
 
 # 3. PATHS
@@ -103,7 +103,6 @@ def save_live_to_firebase(buses, direction_id):
     if not buses: buses = []
     try:
         doc_ref = db.collection("live_data").document(f"route99_dir_{direction_id}")
-        # Add 'load' to the live data we save
         live_bus_list = [{'busId': b.get('busId'), 'lat': b.get('lat'), 'lng': b.get('lng'), 'bearing': b.get('bearing'), 'load': b.get('load', '?')} for b in buses]
         doc_ref.set({'buses': live_bus_list, 'last_seen': firestore.SERVER_TIMESTAMP})
         return len(live_bus_list)
@@ -140,13 +139,6 @@ def save_static_data_to_firebase(full_route_data, direction_id):
             'last_updated': firestore.SERVER_TIMESTAMP
         })
         print(f"  > ✅ Saved STATIC data dir {direction_id}.")
-        
-        # DEBUG: Print stops to help find the right ID
-        print(f"\n--- STOPS FOR DIRECTION {direction_id} ---")
-        for stop in full_route_data.get('busStopList', []):
-            print(f"ID: {stop['stopId']} | Name: {stop['stopName']}")
-        print("----------------------------------------\n")
-        
         return True
     except: return False
 
@@ -159,7 +151,7 @@ def append_status_log(message):
 # --- GENERATE HTML ---
 
 def generate_bus_aunty_html():
-    print("  > 🚌 Generating Bus Aunty HTML (v5.1 Layout)...")
+    print("  > 🚌 Generating Bus Aunty HTML (v5.2)...")
     html_cards = []
     
     for stop_config in STOPS_TO_MONITOR:
@@ -172,20 +164,14 @@ def generate_bus_aunty_html():
         if not static_data: continue
             
         target_stop = next((s for s in static_data.get('busStopList', []) if s['stopId'] == target_stop_id), None)
-        if not target_stop:
-            print(f"⚠️ DEBUG: Could not find Stop ID {target_stop_id} in Direction {direction}")
-            # Print first 3 stops to see what IDs exist
-            print(f"   Available IDs sample: {[s['stopId'] for s in static_data.get('busStopList', [])[:3]]}")
-            continue
+        if not target_stop: continue
 
         stop_coord = (float(target_stop['lat']), float(target_stop['lng']))
         stop_path_index = find_closest_point_on_path(stop_coord, static_data['pointList'])
         
-        # 1. Static Walk Time
         walk_dist_m = haversine(USER_LOCATION, stop_coord, unit=Unit.METERS)
         walk_time_min = (walk_dist_m / AVG_WALK_SPEED_MPS) / 60
         
-        # 2. Find ALL valid upcoming buses
         upcoming_buses = [] 
         
         for bus in live_buses:
@@ -204,13 +190,11 @@ def generate_bus_aunty_html():
         
         upcoming_buses.sort(key=lambda x: x['leave_in'])
         
-        # 3. Determine Display Strings
         main_eta = "--"
         sub_text = "No Bus"
         next_bus_text = "Next: --"
         
         if upcoming_buses:
-            # Primary Bus
             first_bus = upcoming_buses[0]
             val = first_bus['leave_in']
             
@@ -225,14 +209,12 @@ def generate_bus_aunty_html():
                 minutes_ago = abs(int(val))
                 sub_text = f"({minutes_ago} min ago)"
                 
-            # Secondary Bus
             if len(upcoming_buses) > 1:
                 second_bus = upcoming_buses[1]
                 val_2 = int(round(second_bus['leave_in']))
                 load_2 = second_bus['load']
                 next_bus_text = f"Next: {val_2} min (L:{load_2})"
 
-        # 4. Build HTML Card
         html_cards.append(f"""
             <div class="stop-card">
                 <div class="card-header">
@@ -249,7 +231,6 @@ def generate_bus_aunty_html():
             </div>
         """)
 
-    # 5. Full HTML
     html_template = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -266,7 +247,7 @@ def generate_bus_aunty_html():
                 height: 100vh;
                 box-sizing: border-box;
                 display: flex; 
-                flex-direction: row; /* Kindle Landscape */
+                flex-direction: row; 
                 gap: 10px;
             }}
             .stop-card {{
@@ -327,8 +308,8 @@ def deploy_to_firebase_hosting():
 # --- MAIN LOOP ---
 if __name__ == "__main__":
     if not os.path.exists(HISTORICAL_DATA_PATH): os.makedirs(HISTORICAL_DATA_PATH)
-    print("--- 🚌 BusPal v5.1 (Aunty Fix): Engaged! ---")
-    append_status_log(f"\n--- STARTED v5.1 at {datetime.datetime.now().isoformat()} ---")
+    print("--- 🚌 BusPal v5.2 (Verbose Logs): Engaged! ---")
+    append_status_log(f"\n--- STARTED v5.2 at {datetime.datetime.now().isoformat()} ---")
     
     consecutive_errors = 0
     total_ping_count = 0
@@ -338,7 +319,7 @@ if __name__ == "__main__":
         now = datetime.datetime.now()
         is_active = ACTIVE_HOUR_START <= now.hour or now.hour < ACTIVE_HOUR_END
         
-        print(f"--- Fetching ({now.strftime('%H:%M:%S')}) ---")
+        print(f"\n--- Fetching ({now.strftime('%H:%M:%S')}) ---")
         
         api_success = False
         total_buses = 0
@@ -349,12 +330,19 @@ if __name__ == "__main__":
             if data:
                 api_success = True
                 buses = data.get('busList', [])
+                
+                # --- VERBOSE LOGGING RETURNED! ---
+                if buses:
+                    print(f"  > Direction {d}: Found {len(buses)} buses.")
+                    for bus in buses:
+                         print(f"    >> Bus {bus['busId']} | Lat: {bus['lat']}, Lng: {bus['lng']}")
+                # ---------------------------------
+
                 if buses:
                     if is_active: total_buses += save_live_to_firebase(buses, d)
                     for b in buses: b['direction'] = d
                     all_buses_csv.extend(buses)
                 
-                # Save static data (and print Debug info)
                 if is_active and data.get('pointList'): 
                     save_static_data_to_firebase(data, d)
 
