@@ -10,30 +10,52 @@ from firebase_admin import credentials, firestore
 from haversine import haversine, Unit
 import subprocess
 
-# --- CONFIGURATION v5.2 (Verbose Logs) ---
+# --- CONFIGURATION v6.1 ---
 
 # 1. YOUR LOCATION
 USER_LOCATION = (32.00247, 35.87108) 
 AVG_WALK_SPEED_MPS = 1.3 
 AVG_BUS_SPEED_MPS = 8.3  
 
-# 2. MONITOR SETTINGS
-STOPS_TO_MONITOR = [
-    {"name": "To Museum", "stopId": "10619", "direction": 0},
-    {"name": "To Swaileh", "stopId": "10619", "direction": 1} 
+# 2. ROUTES TO TRACK
+# We track all Fast Lane routes
+ROUTES_TO_TRACK = ["98", "99", "100"]
+
+# 3. MONITOR SETTINGS (The "Flow" Dashboard)
+# We assume IDs are shared across routes/directions for BRT stations.
+STOPS_TO_MONITOR = []
+
+# Helper to generate the config for all 3 routes
+target_stops = [
+    {"id": "10620", "name": "Mahmoud Alkiswani"},
+    {"id": "10618", "name": "Agri. College"},
+    {"id": "10617", "name": "Uni. of Jordan"},
+    {"id": "10619", "name": "J.U. Hospital"}
 ]
 
-# 3. PATHS
+for route in ROUTES_TO_TRACK:
+    for stop in target_stops:
+        # Add Direction 0 (e.g., To Museum)
+        STOPS_TO_MONITOR.append({
+            "name": f"{stop['name']} (Dir 0)",
+            "stopId": stop['id'],
+            "direction": 0,
+            "route": route
+        })
+        # Add Direction 1 (e.g., To Swaileh)
+        STOPS_TO_MONITOR.append({
+            "name": f"{stop['name']} (Dir 1)",
+            "stopId": stop['id'],
+            "direction": 1,
+            "route": route
+        })
+
+# 4. PATHS
 SERVICE_KEY_PATH = r"D:\beaning\bean\serviceAccountKey.json"
 PROJECT_ROOT_PATH = r"C:\Users\user\Desktop\Amman-bus-project" 
 HISTORICAL_DATA_PATH = os.path.join(PROJECT_ROOT_PATH, "data")
 HOSTING_PUBLIC_PATH = os.path.join(PROJECT_ROOT_PATH, "public") 
 
-# 4. API
-API_URLS = {
-    0: "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=0&displayRouteCode=99&resultType=111111",
-    1: "https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction=1&displayRouteCode=99&resultType=111111"
-}
 ACTIVE_HOUR_START = 6
 ACTIVE_HOUR_END = 0 
 
@@ -56,23 +78,26 @@ HEADERS = {
 
 # --- HELPER FUNCTIONS ---
 
-def get_full_route_data(api_url):
+def get_full_route_data(route_code, direction):
+    url = f"https://mobile.ammanbus.jo/rl1//web/pathInfo?region=116&lang=en&authType=4&direction={direction}&displayRouteCode={route_code}&resultType=111111"
     try:
-        response = requests.get(api_url, headers=HEADERS, timeout=10)
+        response = requests.get(url, headers=HEADERS, timeout=10)
         response.raise_for_status() 
         data = response.json()
         return data['pathList'][0] if data.get('pathList') else None
     except: return None 
 
-def get_static_data_from_firebase(direction):
+def get_static_data_from_firebase(route, direction):
     try:
-        doc = db.collection("static_route_data").document(f"route_99_dir_{direction}").get()
+        doc_name = f"route_{route}_dir_{direction}"
+        doc = db.collection("static_route_data").document(doc_name).get()
         return doc.to_dict() if doc.exists else None
     except: return None
 
-def get_live_data_from_firebase(direction):
+def get_live_data_from_firebase(route, direction):
     try:
-        doc = db.collection("live_data").document(f"route99_dir_{direction}").get()
+        doc_name = f"route_{route}_dir_{direction}"
+        doc = db.collection("live_data").document(doc_name).get()
         return doc.to_dict().get('buses', []) if doc.exists else []
     except: return []
 
@@ -99,10 +124,11 @@ def calculate_distance_along_path(start_index, end_index, path_points):
 
 # --- DATA SAVING ---
 
-def save_live_to_firebase(buses, direction_id):
+def save_live_to_firebase(buses, route, direction_id):
     if not buses: buses = []
     try:
-        doc_ref = db.collection("live_data").document(f"route99_dir_{direction_id}")
+        doc_name = f"route_{route}_dir_{direction_id}"
+        doc_ref = db.collection("live_data").document(doc_name)
         live_bus_list = [{'busId': b.get('busId'), 'lat': b.get('lat'), 'lng': b.get('lng'), 'bearing': b.get('bearing'), 'load': b.get('load', '?')} for b in buses]
         doc_ref.set({'buses': live_bus_list, 'last_seen': firestore.SERVER_TIMESTAMP})
         return len(live_bus_list)
@@ -116,7 +142,9 @@ def save_historical_to_csv(buses, ping_time, is_night_log):
     new_data = []
     for b in buses:
         new_data.append({
-            'ping_time': ping_time.isoformat(), 'busId': b.get('busId'),
+            'ping_time': ping_time.isoformat(), 
+            'route': b.get('route'), 
+            'busId': b.get('busId'),
             'lat': b.get('lat'), 'lng': b.get('lng'), 'bearing': b.get('bearing'),
             'direction': b.get('direction'), 'plateNumber': b.get('plateNumber'),
             'stopId': b.get('stopId'), 'load': b.get('load', 'N/A')
@@ -127,9 +155,10 @@ def save_historical_to_csv(buses, ping_time, is_night_log):
     except: pass
     return len(new_data)
 
-def save_static_data_to_firebase(full_route_data, direction_id):
+def save_static_data_to_firebase(full_route_data, route, direction_id):
     try:
-        doc_ref = db.collection("static_route_data").document(f"route_99_dir_{direction_id}")
+        doc_name = f"route_{route}_dir_{direction_id}"
+        doc_ref = db.collection("static_route_data").document(doc_name)
         doc = doc_ref.get()
         if doc.exists and doc.to_dict().get('last_updated', datetime.datetime(2000,1,1)).date() == datetime.date.today().date():
             return True
@@ -138,7 +167,14 @@ def save_static_data_to_firebase(full_route_data, direction_id):
             'busStopList': full_route_data.get('busStopList', []),
             'last_updated': firestore.SERVER_TIMESTAMP
         })
-        print(f"  > ✅ Saved STATIC data dir {direction_id}.")
+        print(f"  > ✅ Saved STATIC data for Route {route} Dir {direction_id}.")
+        
+        # --- DEBUG MODE: OFF (Commented out as requested) ---
+        # print(f"\n--- STOPS FOR ROUTE {route} DIR {direction_id} ---")
+        # for stop in full_route_data.get('busStopList', []):
+        #     print(f"ID: {stop['stopId']} | Name: {stop['stopName']}")
+        # print("----------------------------------------\n")
+        
         return True
     except: return False
 
@@ -151,20 +187,21 @@ def append_status_log(message):
 # --- GENERATE HTML ---
 
 def generate_bus_aunty_html():
-    print("  > 🚌 Generating Bus Aunty HTML (v5.2)...")
+    print("  > 🚌 Generating Bus Aunty HTML (Multi-Stop)...")
     html_cards = []
     
     for stop_config in STOPS_TO_MONITOR:
+        route = stop_config['route']
         direction = stop_config['direction']
         target_stop_id = stop_config['stopId']
         
-        static_data = get_static_data_from_firebase(direction)
-        live_buses = get_live_data_from_firebase(direction)
+        static_data = get_static_data_from_firebase(route, direction)
+        live_buses = get_live_data_from_firebase(route, direction)
         
         if not static_data: continue
             
         target_stop = next((s for s in static_data.get('busStopList', []) if s['stopId'] == target_stop_id), None)
-        if not target_stop: continue
+        if not target_stop: continue # Skip invalid stops silently
 
         stop_coord = (float(target_stop['lat']), float(target_stop['lng']))
         stop_path_index = find_closest_point_on_path(stop_coord, static_data['pointList'])
@@ -183,10 +220,7 @@ def generate_bus_aunty_html():
                 bus_travel_time = (dist_m / AVG_BUS_SPEED_MPS) / 60
                 leave_in_min = bus_travel_time - walk_time_min
                 
-                upcoming_buses.append({
-                    'leave_in': leave_in_min,
-                    'load': bus.get('load', '?')
-                })
+                upcoming_buses.append({'leave_in': leave_in_min, 'load': bus.get('load', '?')})
         
         upcoming_buses.sort(key=lambda x: x['leave_in'])
         
@@ -200,14 +234,13 @@ def generate_bus_aunty_html():
             
             if val > 1:
                 main_eta = str(int(round(val)))
-                sub_text = "mins to leave"
+                sub_text = "min to leave"
             elif val > 0:
                 main_eta = "<1"
-                sub_text = "Leave NOW!"
+                sub_text = "Run!"
             else:
                 main_eta = "NOW"
-                minutes_ago = abs(int(val))
-                sub_text = f"({minutes_ago} min ago)"
+                sub_text = f"({abs(int(val))} min ago)"
                 
             if len(upcoming_buses) > 1:
                 second_bus = upcoming_buses[1]
@@ -218,16 +251,14 @@ def generate_bus_aunty_html():
         html_cards.append(f"""
             <div class="stop-card">
                 <div class="card-header">
+                    <span class="route-badge">{route}</span>
                     <span class="stop-name">{stop_config['name']}</span>
-                    <span class="route-badge">99</span>
                 </div>
                 <div class="eta-container">
                     <div class="eta-main">{main_eta}</div>
                     <div class="eta-sub">{sub_text}</div>
                 </div>
-                <div class="footer">
-                    {next_bus_text}
-                </div>
+                <div class="footer">{next_bus_text}</div>
             </div>
         """)
 
@@ -244,42 +275,43 @@ def generate_bus_aunty_html():
                 background-color: #ffffff;
                 font-family: Helvetica, Arial, sans-serif;
                 margin: 0; padding: 10px;
-                height: 100vh;
+                min-height: 100vh;
                 box-sizing: border-box;
-                display: flex; 
-                flex-direction: row; 
+                /* 2-Column Grid */
+                display: grid;
+                grid-template-columns: 1fr 1fr; 
                 gap: 10px;
+                align-content: start;
             }}
             .stop-card {{
-                flex: 1; 
                 background-color: #f4f4f4;
                 border: 2px solid #000;
                 border-radius: 8px;
                 display: flex;
                 flex-direction: column;
                 padding: 10px;
-                height: 90%;
+                min-height: 140px;
             }}
             .card-header {{
-                display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;
+                display: flex; justify-content: flex-start; align-items: center; gap: 8px;
+                border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 5px;
             }}
-            .stop-name {{ font-size: 1.2em; font-weight: bold; color: #333; }}
+            .stop-name {{ font-size: 1em; font-weight: bold; color: #333; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }}
             .route-badge {{ 
                 background: #000; color: #fff; padding: 2px 6px; 
-                border-radius: 4px; font-weight: bold; 
+                border-radius: 4px; font-weight: bold; font-size: 1.1em;
             }}
             .eta-container {{
                 flex-grow: 1; display: flex; flex-direction: column;
                 justify-content: center; align-items: center;
             }}
-            .eta-main {{ font-size: 5em; font-weight: 800; line-height: 1; }}
-            .eta-sub {{ font-size: 1em; color: #555; margin-top: 5px; font-weight: bold; }}
+            .eta-main {{ font-size: 3.5em; font-weight: 800; line-height: 1; }}
+            .eta-sub {{ font-size: 0.9em; color: #555; margin-top: 2px; font-weight: bold; }}
             .footer {{
                 margin-top: auto; border-top: 1px solid #ccc; padding-top: 5px;
-                text-align: center; font-size: 0.9em; color: #444;
+                text-align: center; font-size: 0.8em; color: #444;
             }}
-            .timestamp {{ position: absolute; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; }}
+            .timestamp {{ position: fixed; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; background: rgba(255,255,255,0.8); padding: 2px; }}
         </style>
     </head>
     <body>
@@ -299,6 +331,7 @@ def generate_bus_aunty_html():
         return False
 
 def deploy_to_firebase_hosting():
+    print("  > 🚀 Deploying to Firebase...")
     try:
         subprocess.run(["firebase", "deploy", "--only", "hosting"], 
                        cwd=PROJECT_ROOT_PATH, check=True, shell=True, capture_output=True)
@@ -308,8 +341,8 @@ def deploy_to_firebase_hosting():
 # --- MAIN LOOP ---
 if __name__ == "__main__":
     if not os.path.exists(HISTORICAL_DATA_PATH): os.makedirs(HISTORICAL_DATA_PATH)
-    print("--- 🚌 BusPal v5.2 (Verbose Logs): Engaged! ---")
-    append_status_log(f"\n--- STARTED v5.2 at {datetime.datetime.now().isoformat()} ---")
+    print("--- 🚌 BusPal v6.1 (Multi-Stop Flow): Engaged! ---")
+    append_status_log(f"\n--- STARTED v6.1 at {datetime.datetime.now().isoformat()} ---")
     
     consecutive_errors = 0
     total_ping_count = 0
@@ -325,26 +358,25 @@ if __name__ == "__main__":
         total_buses = 0
         all_buses_csv = []
         
-        for d, url in API_URLS.items():
-            data = get_full_route_data(url)
-            if data:
-                api_success = True
-                buses = data.get('busList', [])
-                
-                # --- VERBOSE LOGGING RETURNED! ---
-                if buses:
-                    print(f"  > Direction {d}: Found {len(buses)} buses.")
-                    for bus in buses:
-                         print(f"    >> Bus {bus['busId']} | Lat: {bus['lat']}, Lng: {bus['lng']}")
-                # ---------------------------------
-
-                if buses:
-                    if is_active: total_buses += save_live_to_firebase(buses, d)
-                    for b in buses: b['direction'] = d
-                    all_buses_csv.extend(buses)
-                
-                if is_active and data.get('pointList'): 
-                    save_static_data_to_firebase(data, d)
+        # LOOP THROUGH ALL ROUTES
+        for route in ROUTES_TO_TRACK:
+            for d in [0, 1]: # Directions
+                data = get_full_route_data(route, d)
+                if data:
+                    api_success = True
+                    buses = data.get('busList', [])
+                    
+                    if buses: print(f"  > Route {route} Dir {d}: Found {len(buses)} buses.")
+                    
+                    if buses:
+                        if is_active: total_buses += save_live_to_firebase(buses, route, d)
+                        for b in buses: 
+                            b['direction'] = d
+                            b['route'] = route
+                        all_buses_csv.extend(buses)
+                    
+                    if is_active and data.get('pointList'): 
+                        save_static_data_to_firebase(data, route, d)
 
         if api_success:
             consecutive_errors = 0
@@ -352,7 +384,7 @@ if __name__ == "__main__":
             ping_streak += 1
             save_historical_to_csv(all_buses_csv, now, not is_active)
             
-            summary = f"Saved {total_buses} buses. Streak: {ping_streak}."
+            summary = f"Saved {total_buses} buses across {len(ROUTES_TO_TRACK)} routes. Streak: {ping_streak}."
             print(f"  > {summary}")
             
             if ping_streak % 10 == 0: append_status_log(f"{now.isoformat()} - {summary}")
@@ -366,4 +398,6 @@ if __name__ == "__main__":
         
         if consecutive_errors >= 5: break
         
-        time.sleep(random.uniform(30, 45))
+        sleep_duration = random.uniform(30, 45)
+        print(f"Waiting {sleep_duration:.1f} seconds...")
+        time.sleep(sleep_duration)

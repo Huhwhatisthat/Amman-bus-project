@@ -180,3 +180,27 @@ SUCCESS: Saved 38 Firebase, 38 CSV. Streak: 20. Total Pings: 20
 --- STARTED v5.1 at 2025-11-20T14:08:08.087345 ---
 
 --- STARTED v5.2 at 2025-11-20T14:14:52.695706 ---
+2025-11-20T14:21:08.007938 - Saved 38 buses. Streak: 10.
+2025-11-20T14:28:26.880430 - Saved 38 buses. Streak: 20.
+2025-11-20T14:36:17.176982 - Saved 39 buses. Streak: 30.
+2025-11-20T14:43:34.153289 - Saved 39 buses. Streak: 40.
+2025-11-20T14:51:07.683265 - Saved 39 buses. Streak: 50.
+2025-11-20T14:58:23.619309 - Saved 39 buses. Streak: 60.
+2025-11-20T15:06:02.049674 - Saved 39 buses. Streak: 70.
+2025-11-20T15:13:30.451935 - Saved 39 buses. Streak: 80.
+2025-11-20T15:20:29.057734 - Saved 39 buses. Streak: 90.
+2025-11-20T15:32:35.400987 - Saved 39 buses. Streak: 10.
+2025-11-20T15:40:20.005348 - Saved 39 buses. Streak: 20.
+2025-11-20T15:47:33.746129 - Saved 38 buses. Streak: 30.
+2025-11-20T15:55:06.546722 - Saved 39 buses. Streak: 40.
+2025-11-20T16:02:33.312817 - Saved 39 buses. Streak: 50.
+2025-11-20T16:09:53.365491 - Saved 39 buses. Streak: 60.
+2025-11-20T16:17:41.320260 - Saved 39 buses. Streak: 70.
+2025-11-20T16:25:37.234522 - Saved 39 buses. Streak: 80.
+2025-11-20T16:33:10.480880 - Saved 39 buses. Streak: 90.
+2025-11-20T16:40:46.349663 - Saved 39 buses. Streak: 100.
+
+--- STARTED v6.0 at 2025-11-20T16:47:39.740927 ---
+
+--- STARTED v6.1 at 2025-11-20T17:20:47.780063 ---
+2025-11-20T17:29:22.722086 - Saved 72 buses across 3 routes. Streak: 10.
