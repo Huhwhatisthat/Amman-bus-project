@@ -11,75 +11,336 @@
                 background-color: #ffffff;
                 font-family: Helvetica, Arial, sans-serif;
                 margin: 0; padding: 10px;
-                height: 100vh;
+                min-height: 100vh;
                 box-sizing: border-box;
-                display: flex; 
-                flex-direction: row; /* Kindle Landscape */
+                /* 2-Column Grid */
+                display: grid;
+                grid-template-columns: 1fr 1fr; 
                 gap: 10px;
+                align-content: start;
             }
             .stop-card {
-                flex: 1; 
                 background-color: #f4f4f4;
                 border: 2px solid #000;
                 border-radius: 8px;
                 display: flex;
                 flex-direction: column;
                 padding: 10px;
-                height: 90%;
+                min-height: 140px;
             }
             .card-header {
-                display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;
+                display: flex; justify-content: flex-start; align-items: center; gap: 8px;
+                border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 5px;
             }
-            .stop-name { font-size: 1.2em; font-weight: bold; color: #333; }
+            .stop-name { font-size: 1em; font-weight: bold; color: #333; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
             .route-badge { 
                 background: #000; color: #fff; padding: 2px 6px; 
-                border-radius: 4px; font-weight: bold; 
+                border-radius: 4px; font-weight: bold; font-size: 1.1em;
             }
             .eta-container {
                 flex-grow: 1; display: flex; flex-direction: column;
                 justify-content: center; align-items: center;
             }
-            .eta-main { font-size: 5em; font-weight: 800; line-height: 1; }
-            .eta-sub { font-size: 1em; color: #555; margin-top: 5px; font-weight: bold; }
+            .eta-main { font-size: 3.5em; font-weight: 800; line-height: 1; }
+            .eta-sub { font-size: 0.9em; color: #555; margin-top: 2px; font-weight: bold; }
             .footer {
                 margin-top: auto; border-top: 1px solid #ccc; padding-top: 5px;
-                text-align: center; font-size: 0.9em; color: #444;
+                text-align: center; font-size: 0.8em; color: #444;
             }
-            .timestamp { position: absolute; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; }
+            .timestamp { position: fixed; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; background: rgba(255,255,255,0.8); padding: 2px; }
         </style>
     </head>
     <body>
         
             <div class="stop-card">
                 <div class="card-header">
-                    <span class="stop-name">To Museum</span>
-                    <span class="route-badge">99</span>
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">Mahmoud Alkiswani (Dir 0)</span>
                 </div>
                 <div class="eta-container">
                     <div class="eta-main">NOW</div>
-                    <div class="eta-sub">(3 min ago)</div>
+                    <div class="eta-sub">(7 min ago)</div>
                 </div>
-                <div class="footer">
-                    Next: 0 min (L:?)
-                </div>
+                <div class="footer">Next: 0 min (L:?)</div>
             </div>
         
             <div class="stop-card">
                 <div class="card-header">
-                    <span class="stop-name">To Swaileh</span>
-                    <span class="route-badge">99</span>
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">Mahmoud Alkiswani (Dir 1)</span>
                 </div>
                 <div class="eta-container">
-                    <div class="eta-main">4</div>
-                    <div class="eta-sub">mins to leave</div>
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(5 min ago)</div>
                 </div>
-                <div class="footer">
-                    Next: 5 min (L:?)
-                </div>
+                <div class="footer">Next: --</div>
             </div>
         
-        <div class="timestamp">Updated: 07:56 PM</div>
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">Agri. College (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(2 min ago)</div>
+                </div>
+                <div class="footer">Next: 4 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">Agri. College (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(8 min ago)</div>
+                </div>
+                <div class="footer">Next: --</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">Uni. of Jordan (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(8 min ago)</div>
+                </div>
+                <div class="footer">Next: -1 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">Uni. of Jordan (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(15 min ago)</div>
+                </div>
+                <div class="footer">Next: --</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">J.U. Hospital (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">3</div>
+                    <div class="eta-sub">min to leave</div>
+                </div>
+                <div class="footer">Next: 10 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">98</span>
+                    <span class="stop-name">J.U. Hospital (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main"><1</div>
+                    <div class="eta-sub">Run!</div>
+                </div>
+                <div class="footer">Next: --</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">Mahmoud Alkiswani (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(11 min ago)</div>
+                </div>
+                <div class="footer">Next: -11 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">Mahmoud Alkiswani (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(11 min ago)</div>
+                </div>
+                <div class="footer">Next: -11 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">Agri. College (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(8 min ago)</div>
+                </div>
+                <div class="footer">Next: -7 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">Agri. College (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(10 min ago)</div>
+                </div>
+                <div class="footer">Next: -6 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">Uni. of Jordan (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(16 min ago)</div>
+                </div>
+                <div class="footer">Next: -15 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">Uni. of Jordan (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(17 min ago)</div>
+                </div>
+                <div class="footer">Next: -16 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">J.U. Hospital (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(4 min ago)</div>
+                </div>
+                <div class="footer">Next: -3 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">99</span>
+                    <span class="stop-name">J.U. Hospital (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(0 min ago)</div>
+                </div>
+                <div class="footer">Next: 0 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">Mahmoud Alkiswani (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(11 min ago)</div>
+                </div>
+                <div class="footer">Next: -12 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">Mahmoud Alkiswani (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(12 min ago)</div>
+                </div>
+                <div class="footer">Next: -7 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">Agri. College (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(11 min ago)</div>
+                </div>
+                <div class="footer">Next: -12 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">Agri. College (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(11 min ago)</div>
+                </div>
+                <div class="footer">Next: -11 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">Uni. of Jordan (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(14 min ago)</div>
+                </div>
+                <div class="footer">Next: -15 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">Uni. of Jordan (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(16 min ago)</div>
+                </div>
+                <div class="footer">Next: -16 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">J.U. Hospital (Dir 0)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(2 min ago)</div>
+                </div>
+                <div class="footer">Next: -2 min (L:?)</div>
+            </div>
+        
+            <div class="stop-card">
+                <div class="card-header">
+                    <span class="route-badge">100</span>
+                    <span class="stop-name">J.U. Hospital (Dir 1)</span>
+                </div>
+                <div class="eta-container">
+                    <div class="eta-main">NOW</div>
+                    <div class="eta-sub">(1 min ago)</div>
+                </div>
+                <div class="footer">Next: 4 min (L:?)</div>
+            </div>
+        
+        <div class="timestamp">Updated: 05:39 PM</div>
     </body>
     </html>
     
