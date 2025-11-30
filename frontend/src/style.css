@@ -1,0 +1,181 @@
+:root {
+  font-family: 'Arial', 'Helvetica Neue', sans-serif;
+  line-height: 1.1;
+  font-weight: 400;
+  
+  /* E-ink optimized colors - high contrast, no gradients */
+  --bg-color: #ffffff;
+  --screen-bg: #e8e8e8;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --route-bg: #000000;
+  --route-text: #ffffff;
+  --border-color: #cccccc;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bus-display {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  padding: 40px;
+}
+
+.screen {
+  flex: 1;
+  background: var(--screen-bg);
+  border: 3px solid var(--border-color);
+  border-radius: 12px;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  overflow: hidden;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for e-ink */
+.column::-webkit-scrollbar {
+  display: none;
+}
+.column {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.column-header {
+  font-size: clamp(48px, 4vw, 72px);
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 4px solid var(--text-primary);
+  flex-shrink: 0;
+}
+
+.bus-row {
+  display: grid;
+  grid-template-columns: 300px 1fr 1fr 80px;
+  align-items: center;
+  gap: 20px;
+  font-size: clamp(36px, 3vw, 56px);
+  color: var(--text-primary);
+  padding: 16px 0;
+  border-bottom: 2px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.route-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.route-number {
+  background: var(--route-bg);
+  color: var(--route-text);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 1px;
+  font-size: 0.9em;
+}
+
+.destination {
+  font-size: 0.5em;
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: normal;
+}
+
+.time {
+  font-weight: bold;
+  text-align: center;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+.arriving {
+  font-weight: 600;
+  font-style: normal;
+}
+
+.bus-icon {
+  font-size: clamp(32px, 2.5vw, 48px);
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  font-size: clamp(32px, 2.5vw, 48px);
+  color: var(--text-secondary);
+  padding: 60px 20px;
+}
+
+/* E-ink display specific optimizations */
+@media (min-width: 1680px) and (min-height: 1264px) {
+  .bus-display {
+    padding: 60px;
+  }
+  
+  .screen {
+    padding: 60px;
+    gap: 80px;
+  }
+  
+  .column-header {
+    font-size: 84px;
+    margin-bottom: 30px;
+  }
+  
+  .bus-row {
+    font-size: 64px;
+    padding: 20px 0;
+    grid-template-columns: 380px 1fr 1fr 100px;
+    gap: 30px;
+  }
+  
+  .route-number {
+    padding: 16px 20px;
+    font-size: 0.85em;
+  }
+  
+  .destination {
+    font-size: 0.45em;
+  }
+  
+  .bus-icon {
+    font-size: 56px;
+  }
+}
