@@ -38,7 +38,7 @@ def save_live_data(buses, route, direction_id):
         doc_name = f"route_{route}_dir_{direction_id}"
         doc_ref = db.collection("live_data").document(doc_name)
         
-        # This list now includes the 'status' tag (MOVING, STOPPED, etc.)
+        # We added 'velocity' and 'status' to the dictionary here
         live_bus_list = [
             {
                 'busId': b.get('busId'), 
@@ -46,21 +46,33 @@ def save_live_data(buses, route, direction_id):
                 'lng': b.get('lng'), 
                 'bearing': b.get('bearing'), 
                 'load': b.get('load', '?'),
-                'status': b.get('status', 'Unknown')
+                'status': b.get('status', 'Unknown'),
+                'velocity': b.get('velocity', 0) # NEW: Save speed to Firebase
             } for b in buses
         ]
         
         doc_ref.set({'buses': live_bus_list, 'last_seen': firestore.SERVER_TIMESTAMP})
         return len(live_bus_list)
-    except: return 0
+    except Exception as e:
+        print(f"Error saving live data: {e}")
+        return 0
 
 def save_static_data(full_route_data, route, direction_id):
+    """
+    Saves the map geometry (pointList) and stop locations to Firebase.
+    Only updates once per day to save on database writes.
+    """
     try:
         doc_name = f"route_{route}_dir_{direction_id}"
         doc_ref = db.collection("static_route_data").document(doc_name)
         doc = doc_ref.get()
-        if doc.exists and doc.to_dict().get('last_updated', datetime.datetime(2000,1,1)).date() == datetime.date.today().date():
-            return True
+        
+        # Check if we already updated the map today
+        if doc.exists:
+            last_updated = doc.to_dict().get('last_updated')
+            if last_updated and last_updated.date() == datetime.date.today():
+                return True
+                
         doc_ref.set({
             'pointList': full_route_data.get('pointList', []),
             'busStopList': full_route_data.get('busStopList', []),
@@ -68,7 +80,9 @@ def save_static_data(full_route_data, route, direction_id):
         })
         print(f"  > 🗺️ Saved STATIC map for Route {route} Dir {direction_id}.")
         return True
-    except: return False
+    except Exception as e:
+        print(f"Error saving static data: {e}")
+        return False
 
 def save_historical_csv(buses, ping_time, is_night_log):
     if not buses: return 0
@@ -89,7 +103,8 @@ def save_historical_csv(buses, ping_time, is_night_log):
             'plateNumber': b.get('plateNumber'),
             'stopId': b.get('stopId'), 
             'load': b.get('load', 'N/A'),
-            'status': b.get('status', 'Unknown') # ADDED: Log the status to the CSV
+            'status': b.get('status', 'Unknown'),
+            'velocity': b.get('velocity', 0) # NEW: Save speed to your CSV logs
         })
     
     df = pd.DataFrame(new_data)
