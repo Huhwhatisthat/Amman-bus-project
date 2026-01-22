@@ -1,3 +1,4 @@
 serviceAccountKey.json
 shortcuts.txt
 venv/
+__pycache__/

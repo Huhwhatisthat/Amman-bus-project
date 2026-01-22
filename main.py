@@ -2,83 +2,86 @@ import time
 import random
 import datetime
 import os
+from haversine import haversine, Unit
 
-# Import our new modules
 import config
 import api_client
 import firebase_manager
 import html_generator
 
+# This remembers buses across loop cycles
+BUS_REGISTRY = {} 
+
+def get_bus_status(bus_id, current_coord, path_points):
+    """
+    Logic to determine if a bus is Moving, Boarding, or Parked.
+    """
+    if bus_id not in BUS_REGISTRY:
+        BUS_REGISTRY[bus_id] = current_coord
+        return "🆕 NEW", 0
+
+    last_coord = BUS_REGISTRY[bus_id]
+    dist_moved = haversine(last_coord, current_coord, unit=Unit.METERS)
+    BUS_REGISTRY[bus_id] = current_coord # Update registry for next time
+
+    # Determine Path Position
+    # We use the html_generator's math to see where it is on the line
+    idx = html_generator.find_closest_point(current_coord, path_points)
+    is_at_extreme = idx < 5 or idx > (len(path_points) - 5)
+
+    if dist_moved > 5:
+        return "🟢 MOVING", dist_moved
+    else:
+        if is_at_extreme:
+            return "🛑 PARKED (EXTREME)", dist_moved
+        return "🟡 STOPPED (BOARDING?)", dist_moved
+
 if __name__ == "__main__":
     if not os.path.exists(config.HISTORICAL_DATA_PATH): os.makedirs(config.HISTORICAL_DATA_PATH)
     
-    print("--- 🚌 BusPal Modular v1.0: Started! ---")
-    firebase_manager.append_status_log(f"\n--- STARTED MODULAR v1.0 at {datetime.datetime.now().isoformat()} ---")
-    
-    consecutive_errors = 0
-    total_ping_count = 0
-    ping_streak = 0
+    print("--- 🚌 BusPal Dev Build: Movement Tracking v1.0 ---")
     
     while True:
         now = datetime.datetime.now()
-        is_active = config.ACTIVE_HOUR_START <= now.hour or now.hour < config.ACTIVE_HOUR_END
-        
-        print(f"\n--- Fetching ({now.strftime('%H:%M:%S')}) ---")
-        
         api_success = False
-        total_buses = 0
-        all_buses_csv = []
+        all_buses_csv_data = []
         
-        # 1. FETCH DATA
-        for route in config.ROUTES_TO_TRACK:
-            for d in [0, 1]:
-                data = api_client.get_full_route_data(route, d)
-                if data:
-                    api_success = True
-                    buses = data.get('busList', [])
-                    
-                    if buses:
-                        print(f"  > Route {route} Dir {d}: {len(buses)} buses.")
-                        # 2. SAVE LIVE DATA
-                        if is_active: 
-                            total_buses += firebase_manager.save_live_data(buses, route, d)
-                        
-                        for b in buses: 
-                            b['direction'] = d
-                            b['route'] = route
-                        all_buses_csv.extend(buses)
-                    
-                    # 3. SAVE STATIC DATA
-                    if is_active and data.get('pointList'): 
-                        firebase_manager.save_static_data(data, route, d)
+        # We only track Route 99, Dir 0 as requested
+        data = api_client.get_full_route_data("99", 0)
+        
+        if data:
+            api_success = True
+            buses = data.get('busList', [])
+            path_points = data.get('pointList', [])
+            
+            print(f"\n--- Snapshot: {now.strftime('%H:%M:%S')} | {len(buses)} Buses Found ---")
 
-        # 4. HANDLE RESULTS
+            for b in buses:
+                b_id = b.get('busId')
+                curr_loc = (float(b['lat']), float(b['lng']))
+                
+                # GET MOVEMENT STATUS
+                status, diff = get_bus_status(b_id, curr_loc, path_points)
+                
+                print(f"  > Bus {b_id} | {status} | Delta: {diff:.1f}m")
+                if "MOVING" in status:
+                    print(f"    Current: {curr_loc}")
+
+                # Prepare for storage
+                b['direction'] = 0
+                b['route'] = "99"
+                all_buses_csv_data.extend(buses)
+                
+            firebase_manager.save_live_data(buses, "99", 0)
+            firebase_manager.save_static_data(data, "99", 0)
+
         if api_success:
-            consecutive_errors = 0
-            total_ping_count += 1
-            ping_streak += 1
-            
-            # Save CSV
-            firebase_manager.save_historical_csv(all_buses_csv, now, not is_active)
-            
-            summary = f"Saved {total_buses} buses. Streak: {ping_streak}."
-            print(f"  > {summary}")
-            
-            if ping_streak % 10 == 0: 
-                firebase_manager.append_status_log(f"{now.isoformat()} - {summary}")
-            
-            # 5. GENERATE & DEPLOY
+            firebase_manager.save_historical_csv(all_buses_csv_data, now, False)
             if html_generator.generate_html():
-                if total_ping_count % 5 == 0: 
-                    html_generator.deploy()
+                html_generator.deploy()
         else:
-            consecutive_errors += 1
-            print(f"  > ❌ API Error. Strike {consecutive_errors}")
-            ping_streak = 0
-        
-        if consecutive_errors >= 5: break
-        
-        # Sleep
-        sleep_duration = random.uniform(30, 45)
+            print("  > ⚠️ API Error.")
+
+        sleep_duration = random.uniform(config.PING_DELAY_MIN, config.PING_DELAY_MAX)
         print(f"Waiting {sleep_duration:.1f}s...")
         time.sleep(sleep_duration)
