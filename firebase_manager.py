@@ -37,7 +37,19 @@ def save_live_data(buses, route, direction_id):
     try:
         doc_name = f"route_{route}_dir_{direction_id}"
         doc_ref = db.collection("live_data").document(doc_name)
-        live_bus_list = [{'busId': b.get('busId'), 'lat': b.get('lat'), 'lng': b.get('lng'), 'bearing': b.get('bearing'), 'load': b.get('load', '?')} for b in buses]
+        
+        # This list now includes the 'status' tag (MOVING, STOPPED, etc.)
+        live_bus_list = [
+            {
+                'busId': b.get('busId'), 
+                'lat': b.get('lat'), 
+                'lng': b.get('lng'), 
+                'bearing': b.get('bearing'), 
+                'load': b.get('load', '?'),
+                'status': b.get('status', 'Unknown')
+            } for b in buses
+        ]
+        
         doc_ref.set({'buses': live_bus_list, 'last_seen': firestore.SERVER_TIMESTAMP})
         return len(live_bus_list)
     except: return 0
@@ -47,7 +59,6 @@ def save_static_data(full_route_data, route, direction_id):
         doc_name = f"route_{route}_dir_{direction_id}"
         doc_ref = db.collection("static_route_data").document(doc_name)
         doc = doc_ref.get()
-        # Only update if we haven't updated today
         if doc.exists and doc.to_dict().get('last_updated', datetime.datetime(2000,1,1)).date() == datetime.date.today().date():
             return True
         doc_ref.set({
@@ -71,9 +82,14 @@ def save_historical_csv(buses, ping_time, is_night_log):
             'ping_time': ping_time.isoformat(), 
             'route': b.get('route'), 
             'busId': b.get('busId'),
-            'lat': b.get('lat'), 'lng': b.get('lng'), 'bearing': b.get('bearing'),
-            'direction': b.get('direction'), 'plateNumber': b.get('plateNumber'),
-            'stopId': b.get('stopId'), 'load': b.get('load', 'N/A')
+            'lat': b.get('lat'), 
+            'lng': b.get('lng'), 
+            'bearing': b.get('bearing'),
+            'direction': b.get('direction'), 
+            'plateNumber': b.get('plateNumber'),
+            'stopId': b.get('stopId'), 
+            'load': b.get('load', 'N/A'),
+            'status': b.get('status', 'Unknown') # ADDED: Log the status to the CSV
         })
     
     df = pd.DataFrame(new_data)
