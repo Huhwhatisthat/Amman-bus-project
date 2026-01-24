@@ -1,19 +1,32 @@
 import time
 import datetime
 import html_generator
+import map_generator
 import firebase_manager
 
-if __name__ == "__main__":
-    print("--- 🖥️ BusPal Dashboard Monitor: Active ---")
+print("--- 👻 BusPal Ghost Engine: Predicting Amman Movement ---")
+
+def run_prediction_cycle():
+    now = datetime.datetime.now()
+    timestamp = now.strftime('%H:%M:%S')
     
-    while True:
-        now = datetime.datetime.now()
-        print(f"[{now.strftime('%H:%M:%S')}] Refreshing Dashboard...")
-        
-        # 1. Generate the HTML from whatever is currently in Firebase
+    # 1. Fetch latest "all_active" data from cloud
+    all_buses = firebase_manager.get_live_data_full("all_active", 0)
+    
+    if all_buses:
+        bus_list = all_buses.get('buses', [])
+        print(f"[{timestamp}] Refreshing Views | {len(bus_list)} Buses tracked.")
+
+        # 2. Update Map and ETA List
+        map_generator.generate_map_html(bus_list)
         if html_generator.generate_html():
-            # 2. Deploy it immediately
+            # 3. Deploy
             html_generator.deploy()
-            
-        print("Done. Waiting 60s for next update.")
-        time.sleep(60) # You can make this faster or slower independently
+    else:
+        print(f"[{timestamp}] ⚠️ No active data in Firebase yet.")
+
+if __name__ == "__main__":
+    GHOST_REFRESH_RATE = 20 
+    while True:
+        run_prediction_cycle()
+        time.sleep(GHOST_REFRESH_RATE)

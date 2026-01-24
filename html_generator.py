@@ -38,10 +38,13 @@ def generate_html():
         target_stop_id = stop_config['stopId']
         
         static_data = firebase_manager.get_static_data(route, direction)
-        live_buses = firebase_manager.get_live_data(route, direction)
+        live_data_package = firebase_manager.get_live_data_full(route, direction) # We need the timestamp
         
-        if not static_data: continue
-            
+        if not static_data or not live_data_package: continue
+        
+        live_buses = live_data_package.get('buses', [])
+        last_seen_api = live_data_package.get('last_seen') # This is the "T+0" moment
+
         target_stop = next((s for s in static_data.get('busStopList', []) if s['stopId'] == target_stop_id), None)
         if not target_stop: continue 
 
@@ -58,11 +61,25 @@ def generate_html():
             bus_path_index = find_closest_point(bus_coord, static_data['pointList'])
             
             if bus_path_index < stop_path_index:
-                dist_m = calculate_path_dist(bus_path_index, stop_path_index, static_data['pointList'])
+                # --- INTERPOLATION LOGIC ---
+                raw_dist_m = calculate_path_dist(bus_path_index, stop_path_index, static_data['pointList'])
+                
+                # How many seconds since the Rig last pinged the API?
+                if last_seen_api:
+                    # last_seen_api is a Firestore timestamp; convert to local datetime
+                    time_diff = (datetime.datetime.now(datetime.timezone.utc) - last_seen_api).total_seconds()
+                    # Predicted distance covered since last ping
+                    ghost_offset = bus.get('velocity', 0) * time_diff
+                    # Final interpolated distance
+                    dist_m = max(0, raw_dist_m - ghost_offset)
+                else:
+                    dist_m = raw_dist_m
+
                 bus_travel_time = (dist_m / config.AVG_BUS_SPEED_MPS) / 60
                 leave_in_min = bus_travel_time - walk_time_min
                 
-                upcoming_buses.append({'leave_in': leave_in_min, 'load': bus.get('load', '?')})
+                speed_kmh = int(bus.get('velocity', 0) * 3.6)
+                upcoming_buses.append({'leave_in': leave_in_min, 'load': bus.get('load', '?'), 'speed': speed_kmh})
         
         upcoming_buses.sort(key=lambda x: x['leave_in'])
         
@@ -70,10 +87,12 @@ def generate_html():
         main_eta = "--"
         sub_text = "No Bus"
         next_bus_text = "Next: --"
+        current_speed_html = ""
         
         if upcoming_buses:
             first_bus = upcoming_buses[0]
             val = first_bus['leave_in']
+            current_speed_html = f'<span class="speed-tag">{first_bus["speed"]} km/h</span>'
             
             if val > 1:
                 main_eta = str(int(round(val)))
@@ -88,14 +107,14 @@ def generate_html():
             if len(upcoming_buses) > 1:
                 second_bus = upcoming_buses[1]
                 val_2 = int(round(second_bus['leave_in']))
-                load_2 = second_bus['load']
-                next_bus_text = f"Next: {val_2} min (L:{load_2})"
+                next_bus_text = f"Next: {val_2} min"
 
         html_cards.append(f"""
             <div class="stop-card">
                 <div class="card-header">
                     <span class="route-badge">{route}</span>
                     <span class="stop-name">{stop_config['name']}</span>
+                    {current_speed_html}
                 </div>
                 <div class="eta-container">
                     <div class="eta-main">{main_eta}</div>
@@ -105,8 +124,7 @@ def generate_html():
             </div>
         """)
     
-    # Simple CSS Template (Condensed)
-    html_template = f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="refresh" content="30"><title>Bus Aunty</title><style>body {{ background-color: #ffffff; font-family: Helvetica, Arial, sans-serif; margin: 0; padding: 10px; min-height: 100vh; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }} .stop-card {{ background-color: #f4f4f4; border: 2px solid #000; border-radius: 8px; display: flex; flex-direction: column; padding: 10px; min-height: 140px; }} .card-header {{ display: flex; justify-content: flex-start; align-items: center; gap: 8px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 5px; }} .stop-name {{ font-size: 1em; font-weight: bold; color: #333; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }} .route-badge {{ background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 1.1em; }} .eta-container {{ flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }} .eta-main {{ font-size: 3.5em; font-weight: 800; line-height: 1; }} .eta-sub {{ font-size: 0.9em; color: #555; margin-top: 2px; font-weight: bold; }} .footer {{ margin-top: auto; border-top: 1px solid #ccc; padding-top: 5px; text-align: center; font-size: 0.8em; color: #444; }} .timestamp {{ position: fixed; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; background: rgba(255,255,255,0.8); padding: 2px; }}</style></head><body>{''.join(html_cards)}<div class="timestamp">Updated: {datetime.datetime.now().strftime('%I:%M %p')}</div></body></html>"""
+    html_template = f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="refresh" content="20"><title>Bus Aunty</title><style>body {{ background-color: #ffffff; font-family: Helvetica, Arial, sans-serif; margin: 0; padding: 10px; min-height: 100vh; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }} .stop-card {{ background-color: #f4f4f4; border: 2px solid #000; border-radius: 8px; display: flex; flex-direction: column; padding: 10px; min-height: 140px; }} .card-header {{ display: flex; justify-content: flex-start; align-items: center; gap: 8px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 5px; }} .stop-name {{ font-size: 0.9em; font-weight: bold; color: #333; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex-grow: 1; }} .route-badge {{ background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 1.1em; }} .speed-tag {{ background: #ddd; color: #000; padding: 2px 5px; border-radius: 4px; font-size: 0.7em; font-weight: bold; }} .eta-container {{ flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }} .eta-main {{ font-size: 3.5em; font-weight: 800; line-height: 1; }} .eta-sub {{ font-size: 0.9em; color: #555; margin-top: 2px; font-weight: bold; }} .footer {{ margin-top: auto; border-top: 1px solid #ccc; padding-top: 5px; text-align: center; font-size: 0.8em; color: #444; }} .timestamp {{ position: fixed; bottom: 5px; right: 5px; font-size: 0.7em; color: #aaa; background: rgba(255,255,255,0.8); padding: 2px; }}</style></head><body>{''.join(html_cards)}<div class="timestamp">Ghost Prediction Active | Updated: {datetime.datetime.now().strftime('%I:%M %p')}</div></body></html>"""
     
     try:
         html_file_path = os.path.join(config.HOSTING_PUBLIC_PATH, "bus_aunty.html")

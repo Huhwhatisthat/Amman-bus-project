@@ -13,7 +13,7 @@ AVG_WALK_SPEED_MPS = 1.3
 AVG_BUS_SPEED_MPS = 8.3  
 ACTIVE_HOUR_START = 6
 ACTIVE_HOUR_END = 0 
-ROUTES_TO_TRACK = ["99"]  # Reduced to one route for density
+ROUTES_TO_TRACK = ["98", "99", "100"]
 
 # --- API HEADERS ---
 HEADERS = {
@@ -23,17 +23,34 @@ HEADERS = {
 }
 
 # --- STOP CONFIGURATION ---
-STOPS_TO_MONITOR = [
-    {"name": "Mahmoud Alkiswani (Dir 0)", "stopId": "10620", "direction": 0, "route": "99"},
-    {"name": "Agri. College (Dir 0)", "stopId": "10618", "direction": 0, "route": "99"},
-    {"name": "Uni. of Jordan (Dir 0)", "stopId": "10617", "direction": 0, "route": "99"},
-    {"name": "J.U. Hospital (Dir 0)", "stopId": "10619", "direction": 0, "route": "99"}
+# We'll go back to the loop-style to monitor all stops for all routes
+STOPS_TO_MONITOR = []
+_target_stops = [
+    {"id": "10620", "name": "Mahmoud Alkiswani"},
+    {"id": "10618", "name": "Agri. College"},
+    #{"id": "10617", "name": "Uni. of Jordan"},
+    {"id": "10619", "name": "J.U. Hospital"}
 ]
+
+for route in ROUTES_TO_TRACK:
+    for stop in _target_stops:
+        for d in [0, 1]:
+            STOPS_TO_MONITOR.append({
+                "name": f"{stop['name']} (Dir {d})",
+                "stopId": stop['id'],
+                "direction": d,
+                "route": route
+            })
         
 # --- STRESS TEST SETTINGS ---
 # Lowering this will make pings more frequent
 PING_DELAY_MIN = 30  # Seconds
-PING_DELAY_MAX = 40  # Seconds
+PING_DELAY_MAX = 33  # Seconds
 
 # How often to push the new data to the website (previously every 5 pings)
 DEPLOY_EVERY_X_PINGS = 5
+
+# --- NIGHT MODE SETTINGS ---
+NIGHT_MODE_PING_INTERVAL = 1800  # 30 Minutes
+STRIKES_UNTIL_NIGHT = 5          # Number of empty/stopped pings before sleep
+FORCE_CLOUD_UPDATE = True        # Toggle this to TRUE only when testing Kindle
