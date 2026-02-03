@@ -53,4 +53,4 @@ DEPLOY_EVERY_X_PINGS = 5
 # --- NIGHT MODE SETTINGS ---
 NIGHT_MODE_PING_INTERVAL = 1800  # 30 Minutes
 STRIKES_UNTIL_NIGHT = 5          # Number of empty/stopped pings before sleep
-FORCE_CLOUD_UPDATE = True        # Toggle this to TRUE only when testing Kindle
+FORCE_CLOUD_UPDATE = False        # Toggle this to TRUE only when testing Kindle
